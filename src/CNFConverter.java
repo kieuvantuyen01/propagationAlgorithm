@@ -29,24 +29,26 @@ public class CNFConverter {
                     List<String> rule2 = exact_one_direction(i, j, numberLink);
                     List<String> rule1 = connectToNumCell(i, j, inputs[i][j], numberLink);
                     List<String> rule3 = connect_same_number(i, j, numberLink);
-                    List<String> rule4 = limit_boundary(i, j, numberLink);
+                    //List<String> rule4 = limit_boundary(i, j, numberLink);
 
-                    clauses += rule1.size() + rule2.size() + rule3.size() + rule4.size();
+                    clauses += rule1.size() + rule2.size() + rule3.size();
+                    //+ rule4.size();
 
                     rules.addAll(rule2);
                     rules.addAll(rule1);
                     rules.addAll(rule3);
-                    rules.addAll(rule4);
+                    //rules.addAll(rule4);
                 } else {
 
                     List<String> rule1 = has_two_directions(i, j, numberLink);
                     List<String> rule2 = connect_same_number(i, j, numberLink);
-                    List<String> rule3 = limit_boundary(i, j, numberLink);
+                    //List<String> rule3 = limit_boundary(i, j, numberLink);
 
-                    clauses += rule1.size() + rule2.size() + rule3.size();
+                    clauses += rule1.size() + rule2.size();
+                    //+ rule3.size();
 
                     rules.addAll(rule1);
-                    rules.addAll(rule3);
+                    //rules.addAll(rule3);
                     rules.addAll(rule2);
 
                 }
@@ -137,11 +139,11 @@ public class CNFConverter {
                     tmpString += "0";
                     resultStringList.add(tmpString);
                     // ô không có giá trị 7 có kết nối sang phải -> ô bên phải không có giá trị 7
-                    tmpString = -computePosition(i, j, k, numberLink) + " ";
+                    /*tmpString = -computePosition(i, j, k, numberLink) + " ";
                     tmpString += computePosition(i, j, q, numberLink) + " ";
                     tmpString += -computePosition(i, j + j0, q, numberLink) + " ";
                     tmpString += "0";
-                    resultStringList.add(tmpString);
+                    resultStringList.add(tmpString);*/
                 }
             } else if ((k == DOWN && i + i0 <= m_limit[k]) || (k == UP && i + i0 >= m_limit[k])) {
                 atleastOneDirection = (-computePosition(i, j, k, numberLink)) + " ";
@@ -163,11 +165,11 @@ public class CNFConverter {
                     tmpString += "0";
                     resultStringList.add(tmpString);
 
-                    tmpString = -computePosition(i, j, k, numberLink) + " ";
+                    /*tmpString = -computePosition(i, j, k, numberLink) + " ";
                     tmpString += computePosition(i, j, q, numberLink) + " ";
                     tmpString += -computePosition(i + i0, j, q, numberLink) + " ";
                     tmpString += "0";
-                    resultStringList.add(tmpString);
+                    resultStringList.add(tmpString);*/
                 }
             }
         }
@@ -198,8 +200,7 @@ public class CNFConverter {
                 }
             }
         }
-        secondClause += "0";
-        resultStringList.add(secondClause);
+
         return resultStringList;
     }
 
@@ -227,8 +228,7 @@ public class CNFConverter {
                 }
             }
         }
-        secondClause += "0";
-        resultStringList.add(secondClause);
+
         return resultStringList;
     }
 
@@ -256,8 +256,7 @@ public class CNFConverter {
                 }
             }
         }
-        secondClause += "0";
-        resultStringList.add(secondClause);
+
         return resultStringList;
     }
 
@@ -285,8 +284,7 @@ public class CNFConverter {
                 }
             }
         }
-        secondClause += "0";
-        resultStringList.add(secondClause);
+
         return resultStringList;
     }
 
@@ -447,13 +445,18 @@ public class CNFConverter {
             case DOWN:
                 return (n - 1) * (j - 1) + i + n * (n - 1);
             default:
-                return 2 * n * (n - 1) + n * (n - 1) * numberLink.getMaxNum() + (j - 1) * numberLink.getMaxNum() + value;
+                return 2 * n * (n - 1) + n * (i - 1) * numberLink.getMaxNum() + (j - 1) * numberLink.getMaxNum() + value;
         }
     }
 
     /*private int computeValue(int i, int j, int value, NumberLink numberLink) {
         int n = numberLink.getCol();
         return 2 * n * (n - 1) + n * (n - 1) * numberLink.getMaxNum() + (j - 1) * numberLink.getMaxNum() + value;
+    }*/
+
+    /*public int getValueOf(int row, int col, int positionValue, NumberLink numberLink) {
+        return positionValue - (row - 1) * (NUM_OF_DIRECTION + numberLink.getMaxNum()) * numberLink.getCol() -
+                (col - 1) * (NUM_OF_DIRECTION + numberLink.getMaxNum());
     }*/
 
     public int getValueOf(int row, int col, int positionValue, NumberLink numberLink) {
