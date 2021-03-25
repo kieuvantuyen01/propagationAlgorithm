@@ -53,13 +53,20 @@ public class CNFConverter {
         for (int i = 1; i < inputs.length; i++) {
             for (int j = 1; j < inputs[i].length; j++) {
                 // cell has number
+                List<String> baseRule2 = connect_same_number(i, j, numberLink);
+                List<String> baseRule1 = onlyOneValue(i, j, numberLink);
                 String baseRule = atLeastOneDirection(i, j, numberLink);
                 rules.add(baseRule);
                 clauses++;
+                clauses += baseRule2.size() + baseRule1.size();
+
+                rules.addAll(baseRule2);
+                rules.addAll(baseRule1);
                 if (inputs[i][j] != 0) {
+
+                    List<String> rule0 = valueFromInput(i, j, inputs[i][j], numberLink);
+
                     List<String> rule2 = new ArrayList<>();
-                    List<String> rule1 = new ArrayList<>();
-                    List<String> rule3 = new ArrayList<>();
                     if (isLUCornerCell(i, j)) {
                         rule2 = LUConner_exact_one_direction(i, j, numberLink);
                     } else if (isRUCornerCell(i, j)) {
@@ -76,39 +83,49 @@ public class CNFConverter {
                         rule2 = UEdge_exact_one_direction(i, j, numberLink);
                     } else if (isDEdgeCell(i, j)) {
                         rule2 = DEdge_exact_one_direction(i, j, numberLink);
-                    } else
-                    {
+                    } else {
                         rule2 = exact_one_direction(i, j, numberLink);
-                        rule1 = connectToNumCell(i, j, inputs[i][j], numberLink);
-                        rule3 = connect_same_number(i, j, numberLink);
                     }
-                    //List<String> rule4 = limit_boundary(i, j, numberLink);
+                    clauses += rule0.size() + rule2.size();
 
-                    clauses += rule1.size() + rule2.size() + rule3.size();
-                    //+ rule4.size();
-
+                    rules.addAll(rule0);
                     rules.addAll(rule2);
-                    rules.addAll(rule1);
-                    rules.addAll(rule3);
-                    //rules.addAll(rule4);
+
+                    // blank cell
                 } else {
 
-                    List<String> rule1 = has_two_directions(i, j, numberLink);
-                    List<String> rule2 = connect_same_number(i, j, numberLink);
-                    //List<String> rule3 = limit_boundary(i, j, numberLink);
+//                    List<String> rule1 = has_two_directions(i, j, numberLink);
 
-                    clauses += rule1.size() + rule2.size();
-                    //+ rule3.size();
+                    List<String> rule2 = new ArrayList<>();
+                    if (isLUCornerCell(i, j)) {
+                        rule2 = LUCorner_has_two_directions(i, j, numberLink);
+                    } else if (isRUCornerCell(i, j)) {
+                        rule2 = RUCorner_has_two_directions(i, j, numberLink);
+                    } else if (isRDCornerCell(i, j)) {
+                        rule2 = RDCorner_has_two_directions(i, j, numberLink);
+                    } else if (isLDCornerCell(i, j)) {
+                        rule2 = LDCorner_has_two_directions(i, j, numberLink);
+                    } else if (isLEdgeCell(i, j)) {
+                        rule2 = LEdge_has_two_directions(i, j, numberLink);
+                    } else if (isREdgeCell(i, j)) {
+                        rule2 = REdge_has_two_directions(i, j, numberLink);
+                    } else if (isUEdgeCell(i, j)) {
+                        rule2 = UEdge_has_two_directions(i, j, numberLink);
+                    } else if (isDEdgeCell(i, j)) {
+                        rule2 = DEdge_has_two_directions(i, j, numberLink);
+                    } else {
+                        rule2 = has_two_directions(i, j, numberLink);
+                    }
 
-                    rules.addAll(rule1);
-                    //rules.addAll(rule3);
+                    clauses += rule2.size();
+
                     rules.addAll(rule2);
-
                 }
 
             }
         }
-        variables = numberLink.getRow() * numberLink.getCol() * (NUM_OF_DIRECTION + numberLink.getMaxNum());
+        variables = 2*numberLink.getCol()*(numberLink.getCol() - 1) + numberLink.getRow() * numberLink.getCol() * numberLink.getMaxNum();
+        System.out.println("clauses size: " + rules.size());
         return new SatEncoding(rules, clauses, variables);
     }
 
@@ -353,7 +370,7 @@ public class CNFConverter {
         return resultStringList;
     }
 
-    private List<String> LEdge_has_two_direction(int i, int j, NumberLink numberLink) {
+    private List<String> LEdge_has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resulStringList = new ArrayList<>();
 
         for (int k = 1; k <= NUM_OF_DIRECTION; k++) {
@@ -375,17 +392,17 @@ public class CNFConverter {
                 String secondClause = computePosition(i, j, k, numberLink) + " ";
                 for (int q = 1; q <= NUM_OF_DIRECTION; q++) {
                     if (q != LEFT && q != k) {
-                        secondClause += computePosition(i, j, q, numberLink) + " ";
+                        secondClause += -computePosition(i, j, q, numberLink) + " ";
                     }
-                    secondClause += "0";
-                    resulStringList.add(secondClause);
                 }
+                secondClause += "0";
+                resulStringList.add(secondClause);
             }
         }
         return resulStringList;
     }
 
-    private List<String> DEdge_has_two_direction(int i, int j, NumberLink numberLink) {
+    private List<String> DEdge_has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resulStringList = new ArrayList<>();
 
         for (int k = 1; k <= NUM_OF_DIRECTION; k++) {
@@ -407,17 +424,17 @@ public class CNFConverter {
                 String secondClause = computePosition(i, j, k, numberLink) + " ";
                 for (int q = 1; q <= NUM_OF_DIRECTION; q++) {
                     if (q != DOWN && q != k) {
-                        secondClause += computePosition(i, j, q, numberLink) + " ";
+                        secondClause += -computePosition(i, j, q, numberLink) + " ";
                     }
-                    secondClause += "0";
-                    resulStringList.add(secondClause);
                 }
+                secondClause += "0";
+                resulStringList.add(secondClause);
             }
         }
         return resulStringList;
     }
 
-    private List<String> REdge_has_two_direction(int i, int j, NumberLink numberLink) {
+    private List<String> REdge_has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resulStringList = new ArrayList<>();
 
         for (int k = 1; k <= NUM_OF_DIRECTION; k++) {
@@ -439,17 +456,17 @@ public class CNFConverter {
                 String secondClause = computePosition(i, j, k, numberLink) + " ";
                 for (int q = 1; q <= NUM_OF_DIRECTION; q++) {
                     if (q != RIGHT && q != k) {
-                        secondClause += computePosition(i, j, q, numberLink) + " ";
+                        secondClause += -computePosition(i, j, q, numberLink) + " ";
                     }
-                    secondClause += "0";
-                    resulStringList.add(secondClause);
                 }
+                secondClause += "0";
+                resulStringList.add(secondClause);
             }
         }
         return resulStringList;
     }
 
-    private List<String> UEdge_has_two_direction(int i, int j, NumberLink numberLink) {
+    private List<String> UEdge_has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resulStringList = new ArrayList<>();
 
         for (int k = 1; k <= NUM_OF_DIRECTION; k++) {
@@ -465,61 +482,60 @@ public class CNFConverter {
             }
         }
 
-
         for (int k = 1; k <= NUM_OF_DIRECTION; k++) {
             if (k != UP) {
                 String secondClause = computePosition(i, j, k, numberLink) + " ";
                 for (int q = 1; q <= NUM_OF_DIRECTION; q++) {
                     if (q != UP && q != k) {
-                        secondClause += computePosition(i, j, q, numberLink) + " ";
+                        secondClause += -computePosition(i, j, q, numberLink) + " ";
                     }
-                    secondClause += "0";
-                    resulStringList.add(secondClause);
                 }
+                secondClause += "0";
+                resulStringList.add(secondClause);
             }
         }
         return resulStringList;
     }
 
-    private List<String> LUCorner_has_two_direction(int i, int j, NumberLink numberLink) {
+    private List<String> LUCorner_has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 
         //String first = "";
-        String first = computePosition(i, j, DOWN, numberLink) + "0";
-        String second = computePosition(i, j, RIGHT, numberLink) + "0";
+        String first = computePosition(i, j, DOWN, numberLink) + " 0";
+        String second = computePosition(i, j, RIGHT, numberLink) + " 0";
         resultStringList.add(first);
         resultStringList.add(second);
         return resultStringList;
     }
 
-    private List<String> RUCorner_has_two_direction(int i, int j, NumberLink numberLink) {
+    private List<String> RUCorner_has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 
         //String first = "";
-        String first = computePosition(i, j, DOWN, numberLink) + "0";
-        String second = computePosition(i, j, LEFT, numberLink) + "0";
+        String first = computePosition(i, j, DOWN, numberLink) + " 0";
+        String second = computePosition(i, j, LEFT, numberLink) + " 0";
         resultStringList.add(first);
         resultStringList.add(second);
         return resultStringList;
     }
 
-    private List<String> RDCorner_has_two_direction(int i, int j, NumberLink numberLink) {
+    private List<String> RDCorner_has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 
         //String first = "";
-        String first = computePosition(i, j, UP, numberLink) + "0";
-        String second = computePosition(i, j, LEFT, numberLink) + "0";
+        String first = computePosition(i, j, UP, numberLink) + " 0";
+        String second = computePosition(i, j, LEFT, numberLink) + " 0";
         resultStringList.add(first);
         resultStringList.add(second);
         return resultStringList;
     }
 
-    private List<String> LDCorner_has_two_direction(int i, int j, NumberLink numberLink) {
+    private List<String> LDCorner_has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 
         //String first = "";
-        String first = computePosition(i, j, UP, numberLink) + "0";
-        String second = computePosition(i, j, RIGHT, numberLink) + "0";
+        String first = computePosition(i, j, UP, numberLink) + " 0";
+        String second = computePosition(i, j, RIGHT, numberLink) + " 0";
         resultStringList.add(first);
         resultStringList.add(second);
         return resultStringList;
@@ -544,8 +560,30 @@ public class CNFConverter {
         return resultStringList;
     }
 
+    private List<String> onlyOneValue(int i, int j, NumberLink numberLink) {
+        List<String> clauseArr = new ArrayList<>();
+        String exactNumLine = "";
 
-    private List<String> connectToNumCell(int i, int j, int num, NumberLink numberLink) {
+        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
+            exactNumLine += computePosition(i, j, NUM_OF_DIRECTION + k, numberLink) + " ";
+        }
+        exactNumLine += "0";
+        clauseArr.add(exactNumLine);
+
+        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
+            for (int q = 1; q <= numberLink.getMaxNum(); q++) {
+                String firstClause = -computePosition(i, j,NUM_OF_DIRECTION + k, numberLink) + " ";
+                if (q != k) {
+                    firstClause += -computePosition(i, j, NUM_OF_DIRECTION + q, numberLink) + " ";
+                    firstClause += "0";
+                    clauseArr.add(firstClause);
+                }
+            }
+        }
+        return clauseArr;
+    }
+
+    private List<String> valueFromInput(int i, int j, int num, NumberLink numberLink) {
         int result = computePosition(i, j, NUM_OF_DIRECTION + num, numberLink);
         List<String> resultStringList = new ArrayList<>();
 
@@ -553,22 +591,53 @@ public class CNFConverter {
         exactNumLine += result + " 0";
         resultStringList.add(exactNumLine);
 
-        for (int k = 1; k < numberLink.getMaxNum(); k++) {
+/*        for (int k = 1; k < numberLink.getMaxNum(); k++) {
             if (k != num) {
                 exactNumLine = -computePosition(i, j, NUM_OF_DIRECTION + k, numberLink) + " 0";
                 resultStringList.add(exactNumLine);
             }
-        }
+        }*/
         return resultStringList;
     }
 
     private String atLeastOneDirection(int i, int j, NumberLink numberLink) {
         // x1 v x2 v x3 v x4
         String firstLine = "";
-        firstLine += calculatePosition(i, j, LEFT, numberLink, true);
-        firstLine += calculatePosition(i, j, RIGHT, numberLink, true);
-        firstLine += calculatePosition(i, j, UP, numberLink, true);
-        firstLine += calculatePosition(i, j, DOWN, numberLink, true);
+        if (isLUCornerCell(i, j)) {
+            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
+            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
+        } else if (isRUCornerCell(i, j)) {
+            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
+            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
+        } else if (isRDCornerCell(i, j)) {
+            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
+            firstLine += computePosition(i, j, UP, numberLink) + " ";
+        } else if (isLDCornerCell(i, j)) {
+            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
+            firstLine += computePosition(i, j, UP, numberLink) + " ";
+        } else if (isLEdgeCell(i, j)) {
+            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
+            firstLine += computePosition(i, j, UP, numberLink) + " ";
+            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
+        } else if (isREdgeCell(i, j)) {
+            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
+            firstLine += computePosition(i, j, UP, numberLink) + " ";
+            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
+        } else if (isUEdgeCell(i, j)) {
+            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
+            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
+            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
+        } else if (isDEdgeCell(i, j)) {
+            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
+            firstLine += computePosition(i, j, UP, numberLink) + " ";
+            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
+        } else {
+            // x1 v x2 v x3 v x4
+            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
+            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
+            firstLine += computePosition(i, j, UP, numberLink) + " ";
+            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
+        }
         firstLine += "0";
         return firstLine;
     }
@@ -612,7 +681,7 @@ public class CNFConverter {
             case DOWN:
                 return (n - 1) * (j - 1) + i + n * (n - 1);
             default:
-                return 2 * n * (n - 1) + n * (i - 1) * numberLink.getMaxNum() + (j - 1) * numberLink.getMaxNum() + value;
+                return 2 * n * (n - 1) + n * (i - 1) * numberLink.getMaxNum() + (j - 1) * numberLink.getMaxNum() + value - NUM_OF_DIRECTION;
         }
     }
 
