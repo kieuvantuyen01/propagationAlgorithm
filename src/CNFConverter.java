@@ -10,6 +10,38 @@ public class CNFConverter {
     public static final int[][] DIR = new int[][]{{-1000, -1000}, {0, -1}, {0, 1}, {-1, 0}, {1, 0}};
     public static int[] m_limit = new int[]{0, 1, 10, 1, 10};
 
+    boolean isLUCornerCell(int i, int j) {
+        return (i == 1 && j == 1);
+    }
+
+    boolean isLDCornerCell(int i, int j) {
+        return (i == m_limit[DOWN] && j == 1);
+    }
+
+    boolean isRUCornerCell(int i, int j) {
+        return (i == 1 && j == m_limit[RIGHT]);
+    }
+
+    boolean isRDCornerCell(int i, int j) {
+        return (i == m_limit[DOWN] && j == m_limit[RIGHT]);
+    }
+
+    boolean isLEdgeCell(int i, int j) {
+        return (j == 1 && (i > 1 || i < m_limit[DOWN]));
+    }
+
+    boolean isREdgeCell(int i, int j) {
+        return (j == m_limit[RIGHT] && (i > 1 || i < m_limit[DOWN]));
+    }
+
+    boolean isDEdgeCell(int i, int j) {
+        return (i == m_limit[DOWN] && (j > 1 || j < m_limit[RIGHT]));
+    }
+
+    boolean isUEdgeCell(int i, int j) {
+        return (i == 1 && (j > 1 || j < m_limit[RIGHT]));
+    }
+
     public SatEncoding generateSat(NumberLink numberLink) {
         m_limit[RIGHT] = numberLink.getRow();
         m_limit[DOWN] = numberLink.getCol();
@@ -25,10 +57,31 @@ public class CNFConverter {
                 rules.add(baseRule);
                 clauses++;
                 if (inputs[i][j] != 0) {
-
-                    List<String> rule2 = exact_one_direction(i, j, numberLink);
-                    List<String> rule1 = connectToNumCell(i, j, inputs[i][j], numberLink);
-                    List<String> rule3 = connect_same_number(i, j, numberLink);
+                    List<String> rule2 = new ArrayList<>();
+                    List<String> rule1 = new ArrayList<>();
+                    List<String> rule3 = new ArrayList<>();
+                    if (isLUCornerCell(i, j)) {
+                        rule2 = LUConner_exact_one_direction(i, j, numberLink);
+                    } else if (isRUCornerCell(i, j)) {
+                        rule2 = RUConner_exact_one_direction(i, j, numberLink);
+                    } else if (isRDCornerCell(i, j)) {
+                        rule2 = RDConner_exact_one_direction(i, j, numberLink);
+                    } else if (isLDCornerCell(i, j)) {
+                        rule2 = LDConner_exact_one_direction(i, j, numberLink);
+                    } else if (isLEdgeCell(i, j)) {
+                        rule2 = LEdge_exact_one_direction(i, j, numberLink);
+                    } else if (isREdgeCell(i, j)) {
+                        rule2 = REdge_exact_one_direction(i, j, numberLink);
+                    } else if (isUEdgeCell(i, j)) {
+                        rule2 = UEdge_exact_one_direction(i, j, numberLink);
+                    } else if (isDEdgeCell(i, j)) {
+                        rule2 = DEdge_exact_one_direction(i, j, numberLink);
+                    } else
+                    {
+                        rule2 = exact_one_direction(i, j, numberLink);
+                        rule1 = connectToNumCell(i, j, inputs[i][j], numberLink);
+                        rule3 = connect_same_number(i, j, numberLink);
+                    }
                     //List<String> rule4 = limit_boundary(i, j, numberLink);
 
                     clauses += rule1.size() + rule2.size() + rule3.size();
