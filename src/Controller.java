@@ -72,7 +72,6 @@ public class Controller {
         reader.parseInstance("text.cnf");
         satSolver = new SATSolver(reader);
         IProblem problem = satSolver.solve("text.cnf");
-        System.out.println("So bien: " + problem.nVars());
         if (problem.isSatisfiable()) {
             System.out.println("SAT");
             int[] model = problem.model();
@@ -84,7 +83,9 @@ public class Controller {
                     Cell cell = null;
                     for (int k = 0; k < model.length; k++) {
                         if (model[k] > 0) {
+                            //System.out.println(model[k] + " ");
                             int value = cnfConverter.getValueOf(row, col, model[k], numberLink);
+                            System.out.print(value + " ");
                             if (value <= 4 && value >= 1) {
                                 if (cell == null) {
                                     cell = new Cell(row - 1, col - 1, board[row][col]);
