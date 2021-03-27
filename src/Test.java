@@ -32,7 +32,7 @@ public class Test {
                         long t2 = System.currentTimeMillis();
                         time += (t2 - t1);
                         totalTime += time;
-                        System.out.println("Total Time: " + time + " ms");
+                        System.out.println("\nTotal Time: " + time + " ms");
                         for (int i = 0; i < 2 * n - 1; i++) {
                             System.out.print('*');
                         }
