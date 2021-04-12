@@ -18,11 +18,8 @@ public class Controller {
     public static int rows;
     public static int cols;
 
-    public static int main(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
-    //public static void main(String args[]) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
-        // Doc tu file Text
-        //long t1 = System.currentTimeMillis();
-        //File file = new File("./input/15x15-7.in");
+    public static List<Long> main(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
+        List<Long> res = new ArrayList<>();
         Scanner sc = new Scanner(file);
         NumberLink numberLink = new NumberLink();
         numberLink.setRow(sc.nextInt());
@@ -33,10 +30,6 @@ public class Controller {
         int[][] input = new int[numberLink.getRow() + 1][numberLink.getCol() + 1];
         for (int i = 1; i < numberLink.getRow() + 1; i++) {
             for (int j = 1; j < numberLink.getCol() + 1; j++) {
-//                if (input[i][j] == 0) {
-//
-//                    sc.nextInt();
-//                }
                 input[i][j] = sc.nextInt();
             }
         }
@@ -49,10 +42,14 @@ public class Controller {
         File fileCNF = new File("text.cnf");
         FileWriter writer = new FileWriter(fileCNF);
 
+        //long t1 = System.currentTimeMillis();
         SatEncoding satEncoding = cnfConverter.generateSat(numberLink);
-        String firstLine = "p cnf " + satEncoding.getVariables() + " " + satEncoding.getClauses();
-        System.out.println("So luong bien la: " + satEncoding.getVariables());
-        System.out.println("So luong menh de la: " + satEncoding.getClauses());
+
+        long clause = satEncoding.getClauses();
+        long vars = satEncoding.getVariables();
+        String firstLine = "p cnf " + vars + " " + clause;
+        System.out.println("So luong bien la: " + vars);
+        System.out.println("So luong menh de la: " + clause);
         writer.write(firstLine + "\n");
         List<String> rules = satEncoding.getRules();
         for (int i = 0; i < rules.size(); i++) {
@@ -71,7 +68,12 @@ public class Controller {
         DimacsReader reader = new DimacsReader(SolverFactory.newDefault());
         reader.parseInstance("text.cnf");
         satSolver = new SATSolver(reader);
-        IProblem problem = satSolver.solve("text.cnf");
+        IProblem problem = null;
+
+        //while (System.currentTimeMillis() < t1 + 360 * 1000) {
+             problem = satSolver.solve("text.cnf");
+        //}
+        //long t2 = System.currentTimeMillis();
         if (problem.isSatisfiable()) {
             System.out.println("SAT");
             int[] model = problem.model();
@@ -97,16 +99,15 @@ public class Controller {
                     }
                     System.out.print((value - 4) + " ");
                 }
-
-
             }
-
         }  else {
             System.out.println("UNSAT");
         }
-        /*long t2 = System.currentTimeMillis();
-        System.out.println("Total time: " + (t2-t1) + "ms");*/
-        return rows;
+        res.add((long) rows);
+        res.add(clause);
+        res.add(vars);
+        //res.add(t2-t1);
+        return res;
     }
 
     public static void printFormat(NumberLinkResponse response) {

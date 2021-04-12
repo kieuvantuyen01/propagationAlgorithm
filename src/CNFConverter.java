@@ -130,7 +130,7 @@ public class CNFConverter {
         return new SatEncoding(rules, clauses, variables);
     }
 
-    private List<String> limit_boundary(int i, int j, NumberLink numberLink) {
+/*    private List<String> limit_boundary(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 
         if (j <= 1) {
@@ -147,7 +147,7 @@ public class CNFConverter {
         }
 
         return resultStringList;
-    }
+    }*/
 
     private List<String> has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
@@ -610,7 +610,7 @@ public class CNFConverter {
                 + (j - 1) * (NUM_OF_DIRECTION + numberLink.getMaxNum()) + value;
     }*/
 
-    private String calculatePosition(int i, int j, int value, NumberLink numberLink, boolean positive) {
+/*    private String calculatePosition(int i, int j, int value, NumberLink numberLink, boolean positive) {
         int sign = positive ? 1 : -1;
         if (value == LEFT) {
             if (j > 1) {
@@ -630,7 +630,7 @@ public class CNFConverter {
             } else return "";
         }
         return "";
-    }
+    }*/
 
     private int computePosition(int i, int j, int value, NumberLink numberLink) {
         int n = numberLink.getCol();
