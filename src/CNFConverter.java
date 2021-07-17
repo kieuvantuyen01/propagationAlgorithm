@@ -212,6 +212,27 @@ public class CNFConverter {
         return resultStringList;
     }
 
+    private List<String> exact_one_direction(int i, int j, NumberLink numberLink) {
+        List<String> resultStringList = new ArrayList<>();
+        //String tmpClause = "exact_one_direction";
+        //resultStringList.add(tmpClause);
+
+        // (x1 -> -x2) ^ (x1 -> -x3) ^ (x1 -> -x4)...
+        for (int k = 1; k <= NUM_OF_DIRECTION - 1; k++) {
+            for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
+                String firstClause = -computePosition(i, j, k, numberLink) + " ";
+                if (q != k) {
+                    firstClause += -computePosition(i, j, q, numberLink) + " ";
+                    firstClause += "0";
+                    resultStringList.add(firstClause);
+                }
+            }
+        }
+        //secondClause += computePosition(i, j, NUM_OF_DIRECTION, numberLink) + "0";
+
+        return resultStringList;
+    }
+
     private List<String> LEdge_exact_one_direction(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "LEdge_exact_one_direction";
@@ -504,26 +525,7 @@ public class CNFConverter {
         return resultStringList;
     }
 
-    private List<String> exact_one_direction(int i, int j, NumberLink numberLink) {
-        List<String> resultStringList = new ArrayList<>();
-        //String tmpClause = "exact_one_direction";
-        //resultStringList.add(tmpClause);
 
-        // (x1 -> -x2) ^ (x1 -> -x3) ^ (x1 -> -x4)...
-        for (int k = 1; k <= NUM_OF_DIRECTION - 1; k++) {
-            for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
-                String firstClause = -computePosition(i, j, k, numberLink) + " ";
-                if (q != k) {
-                    firstClause += -computePosition(i, j, q, numberLink) + " ";
-                    firstClause += "0";
-                    resultStringList.add(firstClause);
-                }
-            }
-        }
-        //secondClause += computePosition(i, j, NUM_OF_DIRECTION, numberLink) + "0";
-
-        return resultStringList;
-    }
 
     private List<String> onlyOneValue(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
