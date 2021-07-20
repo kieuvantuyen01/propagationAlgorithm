@@ -7,7 +7,7 @@ public class CNFConverter {
     public static final int RIGHT = 2;
     public static final int UP = 3;
     public static final int DOWN = 4;
-    public static final int[][] DIR = new int[][]{{-1000, -1000}, {0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+//    public static final int[] DIR = new int[]{ -1000, -1, 1};
     public static int[] m_limit = new int[]{0, 1, 10, 1, 10};
     public static int num_of_x = 0;
 
@@ -44,7 +44,7 @@ public class CNFConverter {
     }
 
     public SatEncoding generateSat(NumberLink numberLink) {
-        num_of_x =  2 * numberLink.getCol() * (numberLink.getCol() - 1);
+        num_of_x = 2 * numberLink.getCol() * (numberLink.getCol() - 1);
         m_limit[RIGHT] = numberLink.getRow();
         m_limit[DOWN] = numberLink.getCol();
         int[][] inputs = numberLink.getInputs();
@@ -55,14 +55,14 @@ public class CNFConverter {
         for (int i = 1; i < inputs.length; i++) {
             for (int j = 1; j < inputs[i].length; j++) {
                 // cell has number
-                List<String> baseRule2 = connect_same_number(i, j, numberLink);
+//                List<String> baseRule2 = connect_same_number(i, j, numberLink);
                 List<String> baseRule1 = onlyOneValue(i, j, numberLink);
-                String baseRule = atLeastOneDirection(i, j, numberLink);
-                rules.add(baseRule);
+//                String baseRule = atLeastOneDirection(i, j, numberLink);
+//                rules.add(baseRule);
                 clauses++;
-                clauses += baseRule2.size() + baseRule1.size();
+                clauses += baseRule1.size();
 
-                rules.addAll(baseRule2);
+//                rules.addAll(baseRule2);
                 rules.addAll(baseRule1);
                 if (inputs[i][j] != 0) {
 
@@ -153,10 +153,59 @@ public class CNFConverter {
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "has_two_directions";
         //resultStringList.add(tmpClause);
+        String firstClause = computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION-2; k++) {
-            for (int q = k+1; q <= NUM_OF_DIRECTION-1; q++) {
-                for (int p = q+1; p <= NUM_OF_DIRECTION; p++) {
+        firstClause = computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        //
+
+        firstClause = -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        /*for (int k = 1; k <= 2; k++) {
+            for (int q = k + 1; q <= 1; q++) {
+                for (int p = q + 1; p <= NUM_OF_DIRECTION; p++) {
                     String firstClause = computePosition(i, j, k, numberLink) + " ";
                     firstClause += computePosition(i, j, q, numberLink) + " ";
                     firstClause += computePosition(i, j, p, numberLink) + " ";
@@ -166,8 +215,8 @@ public class CNFConverter {
             }
 
         }
-        for (int k = 1; k <= NUM_OF_DIRECTION-2; k++) {
-            for (int q = k + 1; q <= NUM_OF_DIRECTION - 1; q++) {
+        for (int k = 1; k <= 2; k++) {
+            for (int q = k + 1; q <= 1; q++) {
                 for (int p = q + 1; p <= NUM_OF_DIRECTION; p++) {
                     String firstClause = -computePosition(i, j, k, numberLink) + " ";
                     firstClause += -computePosition(i, j, q, numberLink) + " ";
@@ -176,11 +225,11 @@ public class CNFConverter {
                     resultStringList.add(firstClause);
                 }
             }
-        }
+        }*/
         return resultStringList;
     }
 
-    private List<String> connect_same_number(int i, int j, NumberLink numberLink) {
+    /*private List<String> connect_same_number(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "connect_same_number";
         //resultStringList.add(tmpClause);
@@ -191,7 +240,7 @@ public class CNFConverter {
 
             if ((k == RIGHT && (j + j0) <= m_limit[k]) || (k == LEFT && (j + j0) >= m_limit[k])) {
 
-                for (int q = NUM_OF_DIRECTION + 1; q <= NUM_OF_DIRECTION + numberLink.getMaxNum(); q++) {
+                for (int q = 1; q <= numberLink.getMaxNum(); q++) {
                     String tmpString = -computePosition(i, j, k, numberLink) + " ";
                     tmpString += -computePosition(i, j, q, numberLink) + " ";
                     tmpString += computePosition(i, j + j0, q, numberLink) + " ";
@@ -200,7 +249,7 @@ public class CNFConverter {
                 }
             } else if ((k == DOWN && i + i0 <= m_limit[k]) || (k == UP && i + i0 >= m_limit[k])) {
 
-                for (int q = NUM_OF_DIRECTION + 1; q <= NUM_OF_DIRECTION + numberLink.getMaxNum(); q++) {
+                for (int q = 1; q <= numberLink.getMaxNum(); q++) {
                     String tmpString = -computePosition(i, j, k, numberLink) + " ";
                     tmpString += -computePosition(i, j, q, numberLink) + " ";
                     tmpString += computePosition(i + i0, j, q, numberLink) + " ";
@@ -210,7 +259,7 @@ public class CNFConverter {
             }
         }
         return resultStringList;
-    }
+    }*/
 
     private List<String> exact_one_direction(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
@@ -218,16 +267,55 @@ public class CNFConverter {
         //resultStringList.add(tmpClause);
 
         // (x1 -> -x2) ^ (x1 -> -x3) ^ (x1 -> -x4)...
-        for (int k = 1; k <= NUM_OF_DIRECTION - 1; k++) {
-            for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
-                String firstClause = -computePosition(i, j, k, numberLink) + " ";
-                if (q != k) {
-                    firstClause += -computePosition(i, j, q, numberLink) + " ";
-                    firstClause += "0";
-                    resultStringList.add(firstClause);
-                }
+        String tmp = "";
+        tmp += computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        tmp += computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        tmp += computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        tmp += computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        tmp += "0";
+        resultStringList.add(tmp);
+
+        String firstClause = -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j-1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+
+/*        int i0, j0;
+        for (int k = 1; k <= 3; k++) {
+            i0 = DIR[k];
+            for (int q = k+1; k <= 4; k++) {
+                j0 = DIR[q];
+                String secondClause = -computePosition(i + i0, j, numberLink.getInputs()[i][j], numberLink) + " ";
+                secondClause += -computePosition(i, j + j0, numberLink.getInputs()[i][j], numberLink) + " ";
             }
-        }
+        }*/
+
         //secondClause += computePosition(i, j, NUM_OF_DIRECTION, numberLink) + "0";
 
         return resultStringList;
@@ -237,19 +325,32 @@ public class CNFConverter {
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "LEdge_exact_one_direction";
         //resultStringList.add(tmpClause);
+        String firstClause = "";
+        firstClause += computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION - 1; k++) {
-            for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
-                if (k != LEFT && q != LEFT) {
-                    String secondClause = -computePosition(i, j, k, numberLink) + " ";
-                    if (q != k) {
-                        secondClause += -computePosition(i, j, q, numberLink) + " ";
-                        secondClause += "0";
-                        resultStringList.add(secondClause);
-                    }
-                }
-            }
-        }
+        //
+
+        String secondClause = "";
+        secondClause += -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        secondClause += -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        secondClause += "0";
+        resultStringList.add(secondClause);
+
+        secondClause = "";
+        secondClause += -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        secondClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        secondClause += "0";
+        resultStringList.add(secondClause);
+
+        secondClause = "";
+        secondClause += -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        secondClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        secondClause += "0";
+        resultStringList.add(secondClause);
 
         return resultStringList;
     }
@@ -259,7 +360,7 @@ public class CNFConverter {
         //String tmpClause = "REdge_exact_one_direction";
         //resultStringList.add(tmpClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION - 1; k++) {
+        for (int k = 1; k <= 1; k++) {
             for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
                 if (k != RIGHT && q != RIGHT) {
                     String secondClause = -computePosition(i, j, k, numberLink) + " ";
@@ -280,7 +381,7 @@ public class CNFConverter {
         //String tmpClause = "DEdge_exact_one_direction";
         //resultStringList.add(tmpClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION - 1; k++) {
+        for (int k = 1; k <= 1; k++) {
             for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
                 if (k != DOWN && q != DOWN) {
                     String secondClause = -computePosition(i, j, k, numberLink) + " ";
@@ -301,7 +402,7 @@ public class CNFConverter {
         //String tmpClause = "UEdge_exact_one_direction";
         //resultStringList.add(tmpClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION - 1; k++) {
+        for (int k = 1; k <= 1; k++) {
             for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
                 if (k != UP && q != UP) {
                     String secondClause = -computePosition(i, j, k, numberLink) + " ";
@@ -317,14 +418,20 @@ public class CNFConverter {
         return resultStringList;
     }
 
+    //
     private List<String> LUConner_exact_one_direction(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "LUConner_exact_one_direction";
         //resultStringList.add(tmpClause);
+        String firstClause = "";
+        firstClause += computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
 
         String secondClause = "";
-        secondClause += -computePosition(i, j, DOWN, numberLink) + " ";
-        secondClause += -computePosition(i, j, RIGHT, numberLink) + " ";
+        secondClause += -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        secondClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
         secondClause += "0";
         resultStringList.add(secondClause);
         return resultStringList;
@@ -374,8 +481,33 @@ public class CNFConverter {
 //        String tmpClause = "LEdge_has_two_directions";
 //        resultStringList.add(tmpClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION-1; k++) {
-            for (int q = k+1; q <= NUM_OF_DIRECTION; q++) {
+        //co 2 trong 3
+        String firstClause = "";
+        firstClause += computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        firstClause = computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        //
+
+        firstClause += -computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i-1, j, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += -computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " ";
+        firstClause += "0";
+        resultStringList.add(firstClause);
+
+        /*for (int k = 1; k <= 1; k++) {
+            for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
                 if (k != LEFT && q != LEFT) {
                     String firstClause = computePosition(i, j, k, numberLink) + " ";
                     firstClause += computePosition(i, j, q, numberLink) + " ";
@@ -391,7 +523,7 @@ public class CNFConverter {
             }
         }
         second += "0";
-        resultStringList.add(second);
+        resultStringList.add(second);*/
         return resultStringList;
     }
 
@@ -400,8 +532,8 @@ public class CNFConverter {
         //String tmpClause = "DEdge_has_two_directions";
         //resultStringList.add(tmpClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION-1; k++) {
-            for (int q = k+1; q <= NUM_OF_DIRECTION; q++) {
+        for (int k = 1; k <= 1; k++) {
+            for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
                 if (k != DOWN && q != DOWN) {
                     String firstClause = computePosition(i, j, k, numberLink) + " ";
                     firstClause += computePosition(i, j, q, numberLink) + " ";
@@ -426,8 +558,8 @@ public class CNFConverter {
         //String tmpClause = "REdge_has_two_directions";
         //resultStringList.add(tmpClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION-1; k++) {
-            for (int q = k+1; q <= NUM_OF_DIRECTION; q++) {
+        for (int k = 1; k <= 1; k++) {
+            for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
                 if (k != RIGHT && q != RIGHT) {
                     String firstClause = computePosition(i, j, k, numberLink) + " ";
                     firstClause += computePosition(i, j, q, numberLink) + " ";
@@ -452,8 +584,8 @@ public class CNFConverter {
         //String tmpClause = "UEdge_has_two_directions";
         //resultStringList.add(tmpClause);
 
-        for (int k = 1; k <= NUM_OF_DIRECTION-1; k++) {
-            for (int q = k+1; q <= NUM_OF_DIRECTION; q++) {
+        for (int k = 1; k <= 1; k++) {
+            for (int q = k + 1; q <= NUM_OF_DIRECTION; q++) {
                 if (k != UP && q != UP) {
                     String firstClause = computePosition(i, j, k, numberLink) + " ";
                     firstClause += computePosition(i, j, q, numberLink) + " ";
@@ -479,8 +611,8 @@ public class CNFConverter {
         //resultStringList.add(tmpClause);
 
         //String first = "";
-        String first = computePosition(i, j, DOWN, numberLink) + " 0";
-        String second = computePosition(i, j, RIGHT, numberLink) + " 0";
+        String first = computePosition(i+1, j, numberLink.getInputs()[i][j], numberLink) + " 0";
+        String second = computePosition(i, j+1, numberLink.getInputs()[i][j], numberLink) + " 0";
         resultStringList.add(first);
         resultStringList.add(second);
         return resultStringList;
@@ -526,7 +658,6 @@ public class CNFConverter {
     }
 
 
-
     private List<String> onlyOneValue(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "onlyOneValue";
@@ -534,16 +665,16 @@ public class CNFConverter {
         String exactNumLine = "";
 
         for (int k = 1; k <= numberLink.getMaxNum(); k++) {
-            exactNumLine += computePosition(i, j, NUM_OF_DIRECTION + k, numberLink) + " ";
+            exactNumLine += computePosition(i, j, k, numberLink) + " ";
         }
         exactNumLine += "0";
         resultStringList.add(exactNumLine);
 
         for (int k = 1; k <= numberLink.getMaxNum(); k++) {
             for (int q = k + 1; q <= numberLink.getMaxNum(); q++) {
-                String firstClause = -computePosition(i, j, NUM_OF_DIRECTION + k, numberLink) + " ";
+                String firstClause = -computePosition(i, j, k, numberLink) + " ";
                 if (q != k) {
-                    firstClause += -computePosition(i, j, NUM_OF_DIRECTION + q, numberLink) + " ";
+                    firstClause += -computePosition(i, j, q, numberLink) + " ";
                     firstClause += "0";
                     resultStringList.add(firstClause);
                 }
@@ -553,7 +684,7 @@ public class CNFConverter {
     }
 
     private List<String> valueFromInput(int i, int j, int num, NumberLink numberLink) {
-        int result = computePosition(i, j, NUM_OF_DIRECTION + num, numberLink);
+        int result = computePosition(i, j, num, numberLink);
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "valueFromInput";
         //resultStringList.add(tmpClause);
@@ -565,7 +696,7 @@ public class CNFConverter {
         return resultStringList;
     }
 
-    private String atLeastOneDirection(int i, int j, NumberLink numberLink) {
+/*    private String atLeastOneDirection(int i, int j, NumberLink numberLink) {
         // x1 v x2 v x3 v x4
         String firstLine = "";
         if (isLUCornerCell(i, j)) {
@@ -605,11 +736,11 @@ public class CNFConverter {
         }
         firstLine += "0";
         return firstLine;
-    }
+    }*/
 
     /*private int computePosition(int i, int j, int value, NumberLink numberLink) {
-        return (i - 1) * (NUM_OF_DIRECTION + numberLink.getMaxNum()) * numberLink.getCol()
-                + (j - 1) * (NUM_OF_DIRECTION + numberLink.getMaxNum()) + value;
+        return (i - 1) * (numberLink.getMaxNum()) * numberLink.getCol()
+                + (j - 1) * (numberLink.getMaxNum()) + value;
     }*/
 
 /*    private String calculatePosition(int i, int j, int value, NumberLink numberLink, boolean positive) {
@@ -636,18 +767,7 @@ public class CNFConverter {
 
     private int computePosition(int i, int j, int value, NumberLink numberLink) {
         int n = numberLink.getCol();
-        switch (value) {
-            case RIGHT:
-                return (n - 1) * (i - 1) + j;
-            case LEFT:
-                return (n - 1) * (i - 1) + j - 1;
-            case UP:
-                return (n - 1) * (j - 1) + i - 1 + n * (n - 1);
-            case DOWN:
-                return (n - 1) * (j - 1) + i + n * (n - 1);
-            default:
-                return 2 * n * (n - 1) + n * (i - 1) * numberLink.getMaxNum() + (j - 1) * numberLink.getMaxNum() + value - NUM_OF_DIRECTION;
-        }
+        return n * (i - 1) * numberLink.getMaxNum() + (j - 1) * numberLink.getMaxNum() + value;
     }
 
     /*private int computeValue(int i, int j, int value, NumberLink numberLink) {
@@ -656,8 +776,8 @@ public class CNFConverter {
     }*/
 
     /*public int getValueOf(int row, int col, int positionValue, NumberLink numberLink) {
-        return positionValue - (row - 1) * (NUM_OF_DIRECTION + numberLink.getMaxNum()) * numberLink.getCol() -
-                (col - 1) * (NUM_OF_DIRECTION + numberLink.getMaxNum());
+        return positionValue - (row - 1) * (numberLink.getMaxNum()) * numberLink.getCol() -
+                (col - 1) * (numberLink.getMaxNum());
     }*/
 
     public int getValueOf(int row, int col, int positionValue, NumberLink numberLink) {
@@ -684,11 +804,11 @@ public class CNFConverter {
 
     public int getValueOfY(int positionValue, NumberLink numberLink) {
         int n = numberLink.getCol();
-        return (positionValue - num_of_x - 1) % numberLink.getMaxNum() + 1 + NUM_OF_DIRECTION;
+        return (positionValue - num_of_x - 1) % numberLink.getMaxNum() + 1;
     }
 
     public int getValueOfYJ(int positionValue, NumberLink numberLink) {
-        return ((positionValue - num_of_x - 1)/numberLink.getMaxNum()) % numberLink.getCol() + 1;
+        return ((positionValue - num_of_x - 1) / numberLink.getMaxNum()) % numberLink.getCol() + 1;
     }
 
     public int getValueOfYI(int positionValue, NumberLink numberLink) {
