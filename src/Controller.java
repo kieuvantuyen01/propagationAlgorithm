@@ -79,7 +79,7 @@ public class Controller {
             int[] model = problem.model();
             int[][] board = numberLink.getInputs();
             int countBreak = 0;
-            for (int k = CNFConverter.num_of_x; k < model.length; k++) {
+            for (int k = 0; k < model.length; k++) {
 
                 if (model[k] > 0) {
 
@@ -94,10 +94,10 @@ public class Controller {
                         System.out.println();
                         countBreak++;
                     }
-                    if (value-4 < 10) {
+                    if (value < 10) {
                         System.out.print(" ");
                     }
-                    System.out.print((value - 4) + " ");
+                    System.out.print((value) + " ");
                 }
             }
         }  else {
