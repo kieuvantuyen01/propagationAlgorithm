@@ -34,6 +34,7 @@ public class Test {
             } else {
                 if (fileEntry.isFile()) {
                     m++;
+                    System.out.println("This was " + m + "th Test case");
                     temp = fileEntry.getName();
                     if ((temp.substring(temp.lastIndexOf('.') + 1).toLowerCase()).equals("in")) {
                         long time = 0;
@@ -45,10 +46,6 @@ public class Test {
                         totalClause += res.get(1);
                         totalVars += res.get(2);
                         System.out.println("\nTotal Time: " + time + " ms");
-                        for (int i = 0; i < 50; i++) {
-                            System.out.print('*');
-                        }
-                        System.out.println();
                     }
                 }
             }
@@ -69,13 +66,14 @@ public class Test {
 
     public static void main(String[] args) throws IOException, ParseFormatException, TimeoutException, ContradictionException {
         //new Test(300);
-        double averageTime = listFilesForFolder(folder)[0];
-        double averageClause = listFilesForFolder(folder)[1];
-        double averageVar = listFilesForFolder(folder)[2];
+        double[] result = listFilesForFolder(folder);
+        double averageTime = result[0];
+        double averageClause = result[1];
+        double averageVar = result[2];
         try {
-            FileOutputStream fos = new FileOutputStream("E:\\Lab\\Output\\out.txt", true);
+            FileOutputStream fos = new FileOutputStream("E:\\Lab\\Output\\out2.txt", true);
             DataOutputStream dos = new DataOutputStream(fos);
-            dos.writeUTF("SAT Encoding1: ");
+            dos.writeUTF("Propagation: ");
             dos.writeUTF("" + res.get(0) + " " + averageVar + " " + averageClause + " " + averageTime);
             dos.writeChar('\n');
             dos.flush();

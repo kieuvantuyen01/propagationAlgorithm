@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PropragationAlgorithm.iml" filepath="$PROJECT_DIR$/PropragationAlgorithm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PropagationAlgorithm.iml" filepath="$PROJECT_DIR$/PropagationAlgorithm.iml" />
     </modules>
   </component>
 </project>
