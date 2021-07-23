@@ -51,10 +51,6 @@ public class CNFConverter {
         for (int i = 1; i < inputs.length; i++) {
             for (int j = 1; j < inputs[i].length; j++) {
 
-                List<String> baseRule1 = onlyOneValue(i, j, numberLink);
-                clauses += baseRule1.size();
-                rules.addAll(baseRule1);
-
                 // cells have number
                 if (inputs[i][j] != 0) {
 
@@ -87,6 +83,9 @@ public class CNFConverter {
 
                     // blank cell
                 } else {
+                    List<String> baseRule1 = onlyOneValue(i, j, numberLink);
+                    clauses += baseRule1.size();
+                    rules.addAll(baseRule1);
 
                     List<String> rule2 = new ArrayList<>();
                     if (isLUCornerCell(i, j)) {
@@ -126,34 +125,73 @@ public class CNFConverter {
         //String tmpClause = "has_two_directions";
         //resultStringList.add(tmpClause);
         String firstClause = "";
-        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
-            firstClause = -computePosition(i, j, k, numberLink) + " ";
-            firstClause += computePosition(i + 1, j, k, numberLink) + " ";
-            firstClause += computePosition(i - 1, j, k, numberLink) + " ";
-            firstClause += computePosition(i, j + 1, k, numberLink) + " ";
-            firstClause += "0";
-            resultStringList.add(firstClause);
+        int downCellValue = numberLink.getInputs()[i+1][j];
+        int upCellValue = numberLink.getInputs()[i-1][j];
+        int rightCellValue = numberLink.getInputs()[i][j+1];
+        int leftCellValue = numberLink.getInputs()[i][j-1];
+        int[] nextCellValues = {downCellValue, upCellValue, rightCellValue, leftCellValue};
+        if (downCellValue + upCellValue + rightCellValue + leftCellValue == 0) {
+            for (int k = 1; k <= numberLink.getMaxNum(); k++) {
+                firstClause = -computePosition(i, j, k, numberLink) + " ";
+                firstClause += computePosition(i + 1, j, k, numberLink) + " ";
+                firstClause += computePosition(i - 1, j, k, numberLink) + " ";
+                firstClause += computePosition(i, j + 1, k, numberLink) + " ";
+                firstClause += "0";
+                resultStringList.add(firstClause);
 
-            firstClause = -computePosition(i, j, k, numberLink) + " ";
-            firstClause += computePosition(i + 1, j, k, numberLink) + " ";
-            firstClause += computePosition(i - 1, j, k, numberLink) + " ";
-            firstClause += computePosition(i, j - 1, k, numberLink) + " ";
-            firstClause += "0";
-            resultStringList.add(firstClause);
+                firstClause = -computePosition(i, j, k, numberLink) + " ";
+                firstClause += computePosition(i + 1, j, k, numberLink) + " ";
+                firstClause += computePosition(i - 1, j, k, numberLink) + " ";
+                firstClause += computePosition(i, j - 1, k, numberLink) + " ";
+                firstClause += "0";
+                resultStringList.add(firstClause);
 
-            firstClause = -computePosition(i, j, k, numberLink) + " ";
-            firstClause += computePosition(i + 1, j, k, numberLink) + " ";
-            firstClause += computePosition(i, j + 1, k, numberLink) + " ";
-            firstClause += computePosition(i, j - 1, k, numberLink) + " ";
-            firstClause += "0";
-            resultStringList.add(firstClause);
+                firstClause = -computePosition(i, j, k, numberLink) + " ";
+                firstClause += computePosition(i + 1, j, k, numberLink) + " ";
+                firstClause += computePosition(i, j + 1, k, numberLink) + " ";
+                firstClause += computePosition(i, j - 1, k, numberLink) + " ";
+                firstClause += "0";
+                resultStringList.add(firstClause);
 
-            firstClause = -computePosition(i, j, k, numberLink) + " ";
-            firstClause += computePosition(i - 1, j, k, numberLink) + " ";
-            firstClause += computePosition(i, j + 1, k, numberLink) + " ";
-            firstClause += computePosition(i, j - 1, k, numberLink) + " ";
-            firstClause += "0";
-            resultStringList.add(firstClause);
+                firstClause = -computePosition(i, j, k, numberLink) + " ";
+                firstClause += computePosition(i - 1, j, k, numberLink) + " ";
+                firstClause += computePosition(i, j + 1, k, numberLink) + " ";
+                firstClause += computePosition(i, j - 1, k, numberLink) + " ";
+                firstClause += "0";
+                resultStringList.add(firstClause);
+            }
+        } else {
+            for (int k : nextCellValues) {
+                if (k != 0) {
+                    firstClause = -computePosition(i, j, k, numberLink) + " ";
+                    firstClause += computePosition(i + 1, j, k, numberLink) + " ";
+                    firstClause += computePosition(i - 1, j, k, numberLink) + " ";
+                    firstClause += computePosition(i, j + 1, k, numberLink) + " ";
+                    firstClause += "0";
+                    resultStringList.add(firstClause);
+
+                    firstClause = -computePosition(i, j, k, numberLink) + " ";
+                    firstClause += computePosition(i + 1, j, k, numberLink) + " ";
+                    firstClause += computePosition(i - 1, j, k, numberLink) + " ";
+                    firstClause += computePosition(i, j - 1, k, numberLink) + " ";
+                    firstClause += "0";
+                    resultStringList.add(firstClause);
+
+                    firstClause = -computePosition(i, j, k, numberLink) + " ";
+                    firstClause += computePosition(i + 1, j, k, numberLink) + " ";
+                    firstClause += computePosition(i, j + 1, k, numberLink) + " ";
+                    firstClause += computePosition(i, j - 1, k, numberLink) + " ";
+                    firstClause += "0";
+                    resultStringList.add(firstClause);
+
+                    firstClause = -computePosition(i, j, k, numberLink) + " ";
+                    firstClause += computePosition(i - 1, j, k, numberLink) + " ";
+                    firstClause += computePosition(i, j + 1, k, numberLink) + " ";
+                    firstClause += computePosition(i, j - 1, k, numberLink) + " ";
+                    firstClause += "0";
+                    resultStringList.add(firstClause);
+                }
+            }
         }
         //
 
@@ -725,14 +763,12 @@ public class CNFConverter {
         exactNumLine += "0";
         resultStringList.add(exactNumLine);
 
-        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
+        for (int k = 1; k <= numberLink.getMaxNum()-1; k++) {
+            String firstClause = -computePosition(i, j, k, numberLink) + " ";
             for (int q = k + 1; q <= numberLink.getMaxNum(); q++) {
-                String firstClause = -computePosition(i, j, k, numberLink) + " ";
-                if (q != k) {
-                    firstClause += -computePosition(i, j, q, numberLink) + " ";
-                    firstClause += "0";
-                    resultStringList.add(firstClause);
-                }
+                String secondClause = -computePosition(i, j, q, numberLink) + " ";
+                secondClause += "0";
+                resultStringList.add(firstClause + secondClause);
             }
         }
         return resultStringList;
@@ -748,6 +784,14 @@ public class CNFConverter {
         exactNumLine += result + " 0";
         resultStringList.add(exactNumLine);
 
+        String firstClause = -computePosition(i, j, num, numberLink) + " ";
+        for (int q = 1; q <= numberLink.getMaxNum(); q++) {
+            if (q != num) {
+                String secondClause = -computePosition(i, j, q, numberLink) + " ";
+                secondClause += "0";
+                resultStringList.add(firstClause + secondClause);
+            }
+        }
         return resultStringList;
     }
 
