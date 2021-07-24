@@ -784,12 +784,12 @@ public class CNFConverter {
         exactNumLine += result + " 0";
         resultStringList.add(exactNumLine);
 
-        String firstClause = -computePosition(i, j, num, numberLink) + " ";
+        //String firstClause = -computePosition(i, j, num, numberLink) + " ";
         for (int q = 1; q <= numberLink.getMaxNum(); q++) {
             if (q != num) {
                 String secondClause = -computePosition(i, j, q, numberLink) + " ";
                 secondClause += "0";
-                resultStringList.add(firstClause + secondClause);
+                resultStringList.add(secondClause);
             }
         }
         return resultStringList;
