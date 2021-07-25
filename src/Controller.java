@@ -15,18 +15,18 @@ import java.util.Scanner;
 public class Controller {
     private static CNFConverter cnfConverter = new CNFConverter();
     private static SATSolver satSolver;
-    public static int rows;
-    public static int cols;
 
-    public static List<Long> main(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
+
+    public List<Long> encode(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
         List<Long> res = new ArrayList<>();
         Scanner sc = new Scanner(file);
         NumberLink numberLink = new NumberLink();
         numberLink.setRow(sc.nextInt());
-        rows = numberLink.getRow();
+        int rows = numberLink.getRow();
         numberLink.setCol(sc.nextInt());
-        cols = numberLink.getCol();
-        NumberLink.setMaxNum(sc.nextInt());
+        int cols = numberLink.getCol();
+        int maxNum = sc.nextInt();
+        NumberLink.setMaxNum(maxNum);
         int[][] input = new int[numberLink.getRow() + 1][numberLink.getCol() + 1];
         for (int i = 1; i < numberLink.getRow() + 1; i++) {
             for (int j = 1; j < numberLink.getCol() + 1; j++) {
@@ -35,8 +35,8 @@ public class Controller {
         }
         numberLink.setInputs(input);
 
+        // in ra de bai
         System.out.println(numberLink);
-
 
         // Ghi ra file CNF
         File fileCNF = new File("text.cnf");
@@ -77,73 +77,42 @@ public class Controller {
         if (problem.isSatisfiable()) {
             System.out.println("SAT");
             int[] model = problem.model();
-            int[][] board = numberLink.getInputs();
-            int countBreak = 0;
-            for (int k = 0; k < model.length; k++) {
+            printResult(model, numberLink);
 
-                if (model[k] > 0) {
-
-                    int positionValue = model[k];
-                    int i = cnfConverter.getValueOfYI(positionValue, numberLink);
-                    int j = cnfConverter.getValueOfYJ(positionValue, numberLink);
-
-                    int breakPoint = (i - 1) % numberLink.getCol();
-                    int value = cnfConverter.getValueOfY(model[k], numberLink);
-
-                    if (breakPoint == countBreak) {
-                        System.out.println();
-                        countBreak++;
-                    }
-                    if (value < 10) {
-                        System.out.print(" ");
-                    }
-                    System.out.print((value) + " ");
-                }
-            }
         }  else {
             System.out.println("UNSAT");
         }
         res.add((long) rows);
-        res.add(clause);
+        res.add((long) cols);
+        res.add((long) maxNum);
         res.add(vars);
+        res.add(clause);
+
         //res.add(t2-t1);
         return res;
     }
 
-    public static void printFormat(NumberLinkResponse response) {
-        for (int i = 0; i < response.getCells().size(); i++) {
-            int j = 0;
-            for (j = 0; j < response.getCells().get(i).size(); j++) {
-                if (response.getCells().get(i).get(j) == null) {
-                    System.out.println("  ");
-                } else {
-                    if (response.getCells().get(i).get(j).getPattern().size() == 1) {
-                        System.out.print(response.getCells().get(i).get(j).getValue());
-                        if (response.getCells().get(i).get(j).getValue() < 10) {
-                            System.out.print(" ");
-                        }
-                    } else if (response.getCells().get(i).get(j).getPattern().size() == 2) {
-                        //System.out.print(response.getCells().get(i).get(j).getPattern());
-                        int first = response.getCells().get(i).get(j).getPattern().get(0);
-                        int second = response.getCells().get(i).get(j).getPattern().get(1);
-                        if (first == CNFConverter.LEFT && second == CNFConverter.RIGHT)
-                            System.out.print("- ");
-                        else if (first == CNFConverter.LEFT && second == CNFConverter.DOWN)
-                            System.out.print("┐ ");
-                        else if (first == CNFConverter.LEFT && second == CNFConverter.UP)
-                            System.out.print("┘ ");
-                        else if (first == CNFConverter.RIGHT && second == CNFConverter.DOWN)
-                            System.out.print("┌ ");
-                        else if (first == CNFConverter.RIGHT && second == CNFConverter.UP)
-                            System.out.print("└ ");
-                        else if (first == CNFConverter.UP && second == CNFConverter.DOWN)
-                            System.out.print("│ ");
-                    } else if (response.getCells().get(i).get(j).getPattern().size() == 3) {
-                        System.out.print(" * ");
-                    }
+    private void printResult(int[] model, NumberLink numberLink) {
+        int countBreak = 0;
+        for (int k = 0; k < model.length; k++) {
+
+            if (model[k] > 0) {
+
+                int positionValue = model[k];
+                int i = cnfConverter.getValueOfYI(positionValue, numberLink);
+
+                int breakPoint = (i - 1) % numberLink.getCol();
+                int value = cnfConverter.getValueOfY(model[k], numberLink);
+
+                if (breakPoint == countBreak) {
+                    System.out.println();
+                    countBreak++;
                 }
+                if (value < 10) {
+                    System.out.print(" ");
+                }
+                System.out.print((value) + " ");
             }
-            System.out.println();
         }
     }
 }
