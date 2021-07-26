@@ -8,9 +8,7 @@ import org.sat4j.specs.TimeoutException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Controller {
     private static CNFConverter cnfConverter = new CNFConverter();
@@ -21,19 +19,30 @@ public class Controller {
         List<Long> res = new ArrayList<>();
         Scanner sc = new Scanner(file);
         NumberLink numberLink = new NumberLink();
-        numberLink.setRow(sc.nextInt());
-        int rows = numberLink.getRow();
-        numberLink.setCol(sc.nextInt());
-        int cols = numberLink.getCol();
-        int maxNum = sc.nextInt();
-        NumberLink.setMaxNum(maxNum);
+
+        List<List<String>> matrix = new ArrayList<>();
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            List<String> arr = Arrays.asList(line.split(" "));
+            matrix.add(arr);
+        }
+        sc.close();
+
+        numberLink.setRow(matrix.size());
+        numberLink.setCol(matrix.get(0).size());
+
         int[][] input = new int[numberLink.getRow() + 1][numberLink.getCol() + 1];
         for (int i = 1; i < numberLink.getRow() + 1; i++) {
             for (int j = 1; j < numberLink.getCol() + 1; j++) {
-                input[i][j] = sc.nextInt();
+                input[i][j] = Integer.parseInt(matrix.get(i-1).get(j-1));
             }
         }
+
+        numberLink.setMaxNum(getMaxNum(input));
         numberLink.setInputs(input);
+
+        System.out.println("Kich thuoc ma tran: " + numberLink.getRow() + "x" + numberLink.getCol());
+        System.out.println("Gia tri lon nhat: " + numberLink.getMaxNum());
 
         // in ra de bai
         System.out.println(numberLink);
@@ -82,15 +91,28 @@ public class Controller {
         }  else {
             System.out.println("UNSAT");
         }
-        res.add((long) rows);
-        res.add((long) cols);
-        res.add((long) maxNum);
+        res.add((long) numberLink.getRow());
+        res.add((long) numberLink.getCol());
+        res.add((long) numberLink.getMaxNum());
         res.add(vars);
         res.add(clause);
 
         //res.add(t2-t1);
         return res;
     }
+
+    private int getMaxNum(int[][] matrix) {
+        int maxNum = 0;
+        for (int i = 1; i < matrix.length; i++) {
+            for (int j = 1; j < matrix[0].length; j++) {
+                if (maxNum < matrix[i][j]) {
+                    maxNum = matrix[i][j];
+                }
+            }
+        }
+        return maxNum;
+    }
+
 
     private void printResult(int[] model, NumberLink numberLink) {
         int countBreak = 0;

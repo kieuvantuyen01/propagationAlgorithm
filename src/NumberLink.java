@@ -34,14 +34,13 @@ public class NumberLink {
         return maxNum;
     }
 
-    public static void setMaxNum(int maxNum) {
+    public void setMaxNum(int maxNum) {
         NumberLink.maxNum = maxNum;
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("");
-        builder.append(row).append(" ").append(col).append(" \n");
         for (int i = 1; i < inputs.length; i++) {
             for (int j = 1; j < inputs[i].length; j++) {
                 builder.append(inputs[i][j]).append(" ");

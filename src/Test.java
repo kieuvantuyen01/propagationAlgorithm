@@ -33,7 +33,6 @@ public class Test {
                     String fileInfo = "";
                     String fileName = "";
                     fileName = fileEntry.getName();
-                    fileInfo += fileName + " ";
                     if ((fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase()).equals("in")) {
                         System.out.println(fileName);
                         long time = 0;
@@ -43,7 +42,7 @@ public class Test {
                         time += (t2 - t1);
                         System.out.println("\nTotal Time: " + time + " ms");
                         System.out.println("--------------------------------");
-                        fileInfo += res.get(MAX_NUM) + " " + res.get(VARS_NUM) + " " + res.get(CLAUSES_NUM) + " " + time;
+                        fileInfo += fileName + " " + res.get(MAX_NUM) + " " + res.get(VARS_NUM) + " " + res.get(CLAUSES_NUM) + " " + time;
                     }
                     resultList.add(fileInfo);
                 }

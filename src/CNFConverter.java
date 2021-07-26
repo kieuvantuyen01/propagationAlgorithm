@@ -42,8 +42,8 @@ public class CNFConverter {
     }
 
     public SatEncoding generateSat(NumberLink numberLink) {
-        m_limit[RIGHT] = numberLink.getRow();
-        m_limit[DOWN] = numberLink.getCol();
+        m_limit[DOWN] = numberLink.getRow();
+        m_limit[RIGHT] = numberLink.getCol();
         int[][] inputs = numberLink.getInputs();
         int variables = 0;
         int clauses = 0;
