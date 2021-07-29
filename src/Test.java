@@ -24,8 +24,7 @@ public class Test {
         timer.schedule(new RemindTask(), seconds * 1000);
     }
 
-    public static ArrayList<String> listFilesForFolder(final File folder) throws TimeoutException, ParseFormatException, ContradictionException, IOException {
-        ArrayList<String> resultList = new ArrayList<>();
+    public static void listFilesForFolder(final File folder) throws TimeoutException, ParseFormatException, ContradictionException, IOException {
         for (final File fileEntry : folder.listFiles()) {
             if (fileEntry.isDirectory()) {
                 listFilesForFolder(fileEntry);
@@ -46,27 +45,23 @@ public class Test {
                         System.out.println("--------------------------------");
                         fileInfo += fileName + " " + res.get(MAX_NUM) + " " + res.get(VARS_NUM) + " " + res.get(CLAUSES_NUM) + " " + time;
                     }
-                    resultList.add(fileInfo);
+                    outputToTxt(fileInfo);
                 }
             }
         }
-        return resultList;
     }
 
     public static void main(String[] args) throws IOException, ParseFormatException, TimeoutException, ContradictionException {
         //new Test(300);
-        ArrayList<String> resultList = listFilesForFolder(inFolder);
-        outputToTxt(resultList);
+        listFilesForFolder(inFolder);
 
     }
 
-    private static void outputToTxt(ArrayList<String> resultList) {
+    private static void outputToTxt(String result) {
         try {
             FileWriter writer = new FileWriter(outFile, true);
 //            writer.write("Propagation:\n");
-            for (String line : resultList) {
-                writer.write(line + "\n");
-            }
+            writer.write(result + "\n");
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
