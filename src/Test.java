@@ -13,7 +13,9 @@ public class Test {
     private static final int VARS_NUM = 3;
     private static final int CLAUSES_NUM = 4;
     Timer timer;
-    public static File inFolder = new File("./input 2");
+    static String inputFolderPath1 = "./input 2";
+    static String inputFolderPath2 = "E:\\Lab\\TC";
+    public static File inFolder = new File(inputFolderPath2);
     public static File outFile = new File("./output/out2.txt");
     public static Controller controller = new Controller();
 

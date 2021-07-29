@@ -80,7 +80,7 @@ public class Controller {
         IProblem problem = null;
 
         //while (System.currentTimeMillis() < t1 + 360 * 1000) {
-             problem = satSolver.solve("text.cnf");
+        problem = satSolver.solve("text.cnf");
         //}
         //long t2 = System.currentTimeMillis();
         if (problem.isSatisfiable()) {

@@ -55,7 +55,9 @@ public class CNFConverter {
                 if (inputs[i][j] != 0) {
 
                     List<String> rule0 = valueFromInput(i, j, inputs[i][j], numberLink);
-
+                    List<String> rule1 = notValuesFromInput(i, j, inputs[i][j], numberLink);
+                    clauses += rule1.size();
+                    rules.addAll(rule1);
                     List<String> rule2;
                     if (isLUCornerCell(i, j)) {
                         rule2 = LUConner_exact_one_direction(i, j, numberLink);
@@ -745,58 +747,21 @@ public class CNFConverter {
         exactNumLine += result + " 0";
         resultStringList.add(exactNumLine);
 
-        //String firstClause = -computePosition(i, j, num, numberLink) + " ";
+        return resultStringList;
+    }
+
+    private List<String> notValuesFromInput(int i, int j, int num, NumberLink numberLink) {
+        List<String> resultStringList = new ArrayList<>();
+        String firstClause = -computePosition(i, j, num, numberLink) + " ";
         for (int q = 1; q <= numberLink.getMaxNum(); q++) {
             if (q != num) {
                 String secondClause = -computePosition(i, j, q, numberLink) + " ";
                 secondClause += "0";
-                resultStringList.add(secondClause);
+                resultStringList.add(firstClause + secondClause);
             }
         }
         return resultStringList;
     }
-
-/*    private String atLeastOneDirection(int i, int j, NumberLink numberLink) {
-        // x1 v x2 v x3 v x4
-        String firstLine = "";
-        if (isLUCornerCell(i, j)) {
-            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
-            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
-        } else if (isRUCornerCell(i, j)) {
-            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
-            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
-        } else if (isRDCornerCell(i, j)) {
-            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
-            firstLine += computePosition(i, j, UP, numberLink) + " ";
-        } else if (isLDCornerCell(i, j)) {
-            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
-            firstLine += computePosition(i, j, UP, numberLink) + " ";
-        } else if (isLEdgeCell(i, j)) {
-            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
-            firstLine += computePosition(i, j, UP, numberLink) + " ";
-            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
-        } else if (isREdgeCell(i, j)) {
-            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
-            firstLine += computePosition(i, j, UP, numberLink) + " ";
-            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
-        } else if (isUEdgeCell(i, j)) {
-            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
-            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
-            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
-        } else if (isDEdgeCell(i, j)) {
-            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
-            firstLine += computePosition(i, j, UP, numberLink) + " ";
-            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
-        } else {
-            // x1 v x2 v x3 v x4
-            firstLine += computePosition(i, j, LEFT, numberLink) + " ";
-            firstLine += computePosition(i, j, RIGHT, numberLink) + " ";
-            firstLine += computePosition(i, j, UP, numberLink) + " ";
-            firstLine += computePosition(i, j, DOWN, numberLink) + " ";
-        }
-        firstLine += "0";
-        return firstLine;
-    }*/
 
 
     private int computePosition(int i, int j, int value, NumberLink numberLink) {

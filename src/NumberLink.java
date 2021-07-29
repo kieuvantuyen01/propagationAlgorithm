@@ -34,7 +34,7 @@ public class NumberLink {
         return maxNum;
     }
 
-    public void setMaxNum(int maxNum) {
+    public static void setMaxNum(int maxNum) {
         NumberLink.maxNum = maxNum;
     }
 
