@@ -36,14 +36,13 @@ public class Test {
                     fileName = fileEntry.getName();
                     if ((fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase()).equals("in")) {
                         System.out.println(fileName);
-                        long time = 0;
                         long t1 = System.currentTimeMillis();
                         List<Long> res = controller.encode(fileEntry);
                         long t2 = System.currentTimeMillis();
-                        time += (t2 - t1);
+                        long time = (t2 - t1);
                         System.out.println("\nTotal Time: " + time + " ms");
                         System.out.println("--------------------------------");
-                        fileInfo += fileName + " " + res.get(MAX_NUM) + " " + res.get(VARS_NUM) + " " + res.get(CLAUSES_NUM) + " " + time;
+                        fileInfo += fileName + "\t" + res.get(MAX_NUM) + "\t" + res.get(VARS_NUM) + "\t" + res.get(CLAUSES_NUM) + "\t" + time;
                     }
                     outputToTxt(fileInfo);
                 }
