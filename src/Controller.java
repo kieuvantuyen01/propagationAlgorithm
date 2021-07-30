@@ -15,10 +15,11 @@ public class Controller {
     private static SATSolver satSolver;
 
 
-    public List<Long> encode(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
-        List<Long> res = new ArrayList<>();
+    public List<String> encode(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
+        List<String> res = new ArrayList<>();
         Scanner sc = new Scanner(file);
         NumberLink numberLink = new NumberLink();
+        String resultSAT = "";
 
         List<List<String>> matrix = new ArrayList<>();
         while (sc.hasNextLine()) {
@@ -84,19 +85,21 @@ public class Controller {
         //}
         //long t2 = System.currentTimeMillis();
         if (problem.isSatisfiable()) {
-            System.out.println("SAT");
+            resultSAT = "SAT";
+            System.out.println(resultSAT);
             int[] model = problem.model();
             printResult(model, numberLink);
 
         }  else {
-            System.out.println("UNSAT");
+            resultSAT = "UNSAT";
+            System.out.println(resultSAT);
         }
-        res.add((long) numberLink.getRow());
-        res.add((long) numberLink.getCol());
-        res.add((long) numberLink.getMaxNum());
-        res.add(vars);
-        res.add(clause);
-
+        res.add(String.valueOf(numberLink.getRow()));
+        res.add(String.valueOf(numberLink.getCol()));
+        res.add(String.valueOf(numberLink.getMaxNum()));
+        res.add(String.valueOf(vars));
+        res.add(String.valueOf(clause));
+        res.add(resultSAT);
         //res.add(t2-t1);
         return res;
     }

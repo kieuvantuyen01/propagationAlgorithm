@@ -11,6 +11,7 @@ public class Test {
     private static final int MAX_NUM = 2;
     private static final int VARS_NUM = 3;
     private static final int CLAUSES_NUM = 4;
+    private static final int SAT = 5;
     Timer timer;
     static String inputFolderPath1 = "./input 2";
     static String inputFolderPath2 = "E:\\Lab\\TC";
@@ -37,13 +38,13 @@ public class Test {
                     if ((fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase()).equals("in")) {
                         System.out.println(fileName);
                         long t1 = System.currentTimeMillis();
-                        List<Long> res = controller.encode(fileEntry);
+                        List<String> res = controller.encode(fileEntry);
                         long t2 = System.currentTimeMillis();
                         long time = (t2 - t1);
                         System.out.println("\nTotal Time: " + time + " ms");
                         System.out.println("--------------------------------");
                         fileInfo += fileName + "\t" + res.get(ROWS) + "x" + res.get(COLS) + "\t" + res.get(MAX_NUM) + "\t"
-                                + res.get(VARS_NUM) + "\t" + res.get(CLAUSES_NUM) + "\t" + time;
+                                + res.get(VARS_NUM) + "\t" + res.get(CLAUSES_NUM) + "\t" + time + "\t" + res.get(SAT);
                     }
                     outputToTxt(fileInfo);
                 }
@@ -53,8 +54,8 @@ public class Test {
 
     public static void main(String[] args) throws IOException, ParseFormatException, TimeoutException, ContradictionException {
         //new Test(300);
-//        listFilesForFolder(inFolder);
-        reformatInput(reformatFolder);
+        listFilesForFolder(inFolder);
+//        reformatInput(reformatFolder);
     }
 
     private static void outputToTxt(String result) {
