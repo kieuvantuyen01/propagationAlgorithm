@@ -9,13 +9,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Test {
+    private static final int ROWS = 0;
+    private static final int COLS = 1;
     private static final int MAX_NUM = 2;
     private static final int VARS_NUM = 3;
     private static final int CLAUSES_NUM = 4;
     Timer timer;
     static String inputFolderPath1 = "./input 2";
     static String inputFolderPath2 = "E:\\Lab\\TC";
-    public static File inFolder = new File(inputFolderPath2);
+    public static File inFolder = new File(inputFolderPath1);
     public static File outFile = new File("./output/out2.txt");
     public static Controller controller = new Controller();
 
@@ -42,7 +44,8 @@ public class Test {
                         long time = (t2 - t1);
                         System.out.println("\nTotal Time: " + time + " ms");
                         System.out.println("--------------------------------");
-                        fileInfo += fileName + "\t" + res.get(MAX_NUM) + "\t" + res.get(VARS_NUM) + "\t" + res.get(CLAUSES_NUM) + "\t" + time;
+                        fileInfo += fileName + "\t" + res.get(ROWS) + "x" + res.get(COLS) + "\t" + res.get(MAX_NUM) + "\t"
+                                + res.get(VARS_NUM) + "\t" + res.get(CLAUSES_NUM) + "\t" + time;
                     }
                     outputToTxt(fileInfo);
                 }
