@@ -13,12 +13,26 @@ import java.util.*;
 public class Controller {
     private static CNFConverter cnfConverter = new CNFConverter();
     private static SATSolver satSolver;
+    static NumberLink numberLink = new NumberLink();
+    static long clause = 0;
+    static long vars = 0;
 
+    public static List<Long> inFoList() {
+        List<Long> res = new ArrayList<>();
+        res.add((long) numberLink.getRow());
+        res.add((long) numberLink.getCol());
+        res.add((long) numberLink.getMaxNum());
+        res.add(vars);
+        res.add(clause);
 
-    public List<Long> encode(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
+        //res.add(t2-t1);
+        return res;
+    }
+
+    public void encode(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
         List<Long> res = new ArrayList<>();
         Scanner sc = new Scanner(file);
-        NumberLink numberLink = new NumberLink();
+
 
         List<List<String>> matrix = new ArrayList<>();
         while (sc.hasNextLine()) {
@@ -34,7 +48,7 @@ public class Controller {
         int[][] input = new int[numberLink.getRow() + 1][numberLink.getCol() + 1];
         for (int i = 1; i < numberLink.getRow() + 1; i++) {
             for (int j = 1; j < numberLink.getCol() + 1; j++) {
-                input[i][j] = Integer.parseInt(matrix.get(i-1).get(j-1));
+                input[i][j] = Integer.parseInt(matrix.get(i - 1).get(j - 1));
             }
         }
 
@@ -54,8 +68,8 @@ public class Controller {
         //long t1 = System.currentTimeMillis();
         SatEncoding satEncoding = cnfConverter.generateSat(numberLink);
 
-        long clause = satEncoding.getClauses();
-        long vars = satEncoding.getVariables();
+        clause = satEncoding.getClauses();
+        vars = satEncoding.getVariables();
         String firstLine = "p cnf " + vars + " " + clause;
         System.out.println("So luong bien la: " + vars);
         System.out.println("So luong menh de la: " + clause);
@@ -88,17 +102,9 @@ public class Controller {
             int[] model = problem.model();
             printResult(model, numberLink);
 
-        }  else {
+        } else {
             System.out.println("UNSAT");
         }
-        res.add((long) numberLink.getRow());
-        res.add((long) numberLink.getCol());
-        res.add((long) numberLink.getMaxNum());
-        res.add(vars);
-        res.add(clause);
-
-        //res.add(t2-t1);
-        return res;
     }
 
     private int getMaxNum(int[][] matrix) {
