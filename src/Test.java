@@ -3,10 +3,7 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.TimeoutException;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Test {
     private static final int ROWS = 0;
@@ -19,6 +16,7 @@ public class Test {
     static String inputFolderPath2 = "E:\\Lab\\TC";
     public static File inFolder = new File(inputFolderPath1);
     public static File outFile = new File("./output/out2.txt");
+    public static File reformatFolder = new File("./input");
     public static Controller controller = new Controller();
 
     public Test(int seconds) {
@@ -55,8 +53,8 @@ public class Test {
 
     public static void main(String[] args) throws IOException, ParseFormatException, TimeoutException, ContradictionException {
         //new Test(300);
-        listFilesForFolder(inFolder);
-
+//        listFilesForFolder(inFolder);
+        reformatInput(reformatFolder);
     }
 
     private static void outputToTxt(String result) {
@@ -76,6 +74,39 @@ public class Test {
             System.out.format("Time's up");
             System.exit(0);
             timer.cancel();
+        }
+    }
+
+    public static void reformatInput(final File folder) throws TimeoutException, ParseFormatException, ContradictionException, IOException {
+        for (final File fileEntry : folder.listFiles()) {
+            if (fileEntry.isDirectory()) {
+                listFilesForFolder(fileEntry);
+            } else {
+                if (fileEntry.isFile()) {
+
+                    Scanner sc = new Scanner(fileEntry);
+
+                    List<String> arr = new ArrayList<>();
+                    while (sc.hasNextLine()) {
+                        String line = sc.nextLine();
+                        arr.add(line);
+                    }
+                    sc.close();
+
+                    arr.remove(0);
+                    arr.remove(0);
+
+                    try {
+                        FileWriter writer = new FileWriter(fileEntry);
+                        for(String line : arr) {
+                            writer.write(line + "\n");
+                        }
+                        writer.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 }
