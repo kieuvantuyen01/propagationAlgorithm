@@ -16,7 +16,7 @@ public class Test {
     static String inputFolderPath2 = "E:\\Lab\\TC";
     public static File inFolder = new File(inputFolderPath2);
     public static File outFile = new File("./output/out2.txt");
-//    public static File reformatFolder = new File("./input");
+    //    public static File reformatFolder = new File("./input");
     public static Controller controller = new Controller();
     static List<Long> res;
 
