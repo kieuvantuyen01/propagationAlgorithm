@@ -118,26 +118,48 @@ public class Controller {
 
 
     private void printResult(int[] model, NumberLink numberLink) {
-        int countBreak = 0;
-        for (int k = 0; k < model.length; k++) {
+        int maxNum = numberLink.getMaxNum();
 
-            if (model[k] > 0) {
+        List<List<Integer>> arr = new ArrayList<>();
+        int count = 0;
+        for (int i = 0; i < (model.length/maxNum); i++) {
+            List<Integer> cell = new ArrayList<>();
+            for (int j = 0; j < maxNum; j++) {
+                cell.add(model[count]);
+                count++;
+            }
+            arr.add(cell);
+        }
 
-                int positionValue = model[k];
-                int i = cnfConverter.getValueOfYI(positionValue, numberLink);
+        count = 0;
+        for (int i = 0; i < arr.size(); i++) {
+            count++;
+            printValue(arr.get(i), maxNum);
 
-                int breakPoint = (i - 1) % numberLink.getCol();
-                int value = cnfConverter.getValueOfY(model[k], numberLink);
+            if (count == numberLink.getCol()) {
+                System.out.println();
+                count = 0;
+            }
+        }
 
-                if (breakPoint == countBreak) {
-                    System.out.println();
-                    countBreak++;
-                }
+
+    }
+
+    private void printValue(List<Integer> cell, int maxNum) {
+
+        boolean hasPositiveValue = false;
+        for (int i : cell) {
+            if (i > 0) {
+                hasPositiveValue = true;
+                int value = cnfConverter.getValueOfY(i, maxNum);
                 if (value < 10) {
                     System.out.print(" ");
                 }
                 System.out.print((value) + " ");
             }
+        }
+        if (!hasPositiveValue) {
+            System.out.print(" - ");
         }
     }
 }

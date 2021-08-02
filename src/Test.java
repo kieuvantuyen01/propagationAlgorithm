@@ -17,7 +17,7 @@ public class Test {
     static String inputFolderPath2 = "E:\\Lab\\TC";
     public static File inFolder = new File(inputFolderPath1);
     public static File outFile = new File("./output/out2.txt");
-    public static File reformatFolder = new File("./input");
+    public static File reformatFolder = new File("");
     public static Controller controller = new Controller();
 
     public Test(int seconds) {

@@ -720,11 +720,11 @@ public class CNFConverter {
         //resultStringList.add(tmpClause);
         String exactNumLine = "";
 
-        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
-            exactNumLine += computePosition(i, j, k, numberLink) + " ";
-        }
-        exactNumLine += "0";
-        resultStringList.add(exactNumLine);
+//        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
+//            exactNumLine += computePosition(i, j, k, numberLink) + " ";
+//        }
+//        exactNumLine += "0";
+//        resultStringList.add(exactNumLine);
 
         for (int k = 1; k <= numberLink.getMaxNum()-1; k++) {
             String firstClause = -computePosition(i, j, k, numberLink) + " ";
@@ -752,12 +752,12 @@ public class CNFConverter {
 
     private List<String> notValuesFromInput(int i, int j, int num, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
-        String firstClause = -computePosition(i, j, num, numberLink) + " ";
+//        String firstClause = -computePosition(i, j, num, numberLink) + " ";
         for (int q = 1; q <= numberLink.getMaxNum(); q++) {
             if (q != num) {
                 String secondClause = -computePosition(i, j, q, numberLink) + " ";
                 secondClause += "0";
-                resultStringList.add(firstClause + secondClause);
+                resultStringList.add(secondClause);
             }
         }
         return resultStringList;
@@ -792,9 +792,8 @@ public class CNFConverter {
         }
     }
 
-    public int getValueOfY(int positionValue, NumberLink numberLink) {
-        int n = numberLink.getCol();
-        return (positionValue - 1) % numberLink.getMaxNum() + 1;
+    public int getValueOfY(int positionValue, int maxNum) {
+        return (positionValue - 1) % maxNum + 1;
     }
 
     public int getValueOfYJ(int positionValue, NumberLink numberLink) {
@@ -802,6 +801,7 @@ public class CNFConverter {
     }
 
     public int getValueOfYI(int positionValue, NumberLink numberLink) {
+        positionValue = Math.abs(positionValue);
         return (positionValue - 1) / (numberLink.getMaxNum() * numberLink.getCol()) + 1;
     }
 
