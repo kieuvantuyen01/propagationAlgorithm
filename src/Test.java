@@ -12,34 +12,40 @@ public class Test {
     private static final int MAX_NUM = 2;
     private static final int VARS_NUM = 3;
     private static final int CLAUSES_NUM = 4;
-    static String inputFolderPath1 = "./input 2";
+    private static final int TIME = 5;
+    private static final int SAT = 6;
+    static Controller controller = new Controller();
+    static String inputFolderPath1 = "./input";
     static String inputFolderPath2 = "E:\\Lab\\TC";
-    public static File inFolder = new File(inputFolderPath2);
+    public static File inFolder = new File(inputFolderPath1);
     public static File outFile = new File("./output/out2.txt");
-    //    public static File reformatFolder = new File("./input");
-    public static Controller controller = new Controller();
-    static List<Long> res;
 
-    public static void listFilesForFolder(final File folder) throws InterruptedException {
+    static List<String> res;
+
+
+    public static void listFilesForFolder(final File folder) throws InterruptedException, FileNotFoundException, TimeoutException {
         for (final File fileEntry : folder.listFiles()) {
             if (fileEntry.isDirectory()) {
                 listFilesForFolder(fileEntry);
-
             } else {
                 if (fileEntry.isFile()) {
                     String fileInfo = "";
                     String fileName = "";
                     fileName = fileEntry.getName();
                     if ((fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase()).equals("in")) {
+                        String time = "";
                         System.out.println(fileName);
-                        long t1 = System.currentTimeMillis();
-                        ExecutorService executor = Executors.newFixedThreadPool(4);
 
+                        controller.read(fileEntry);
+                        /*long t1 = System.currentTimeMillis();*/
+
+                        ExecutorService executor = Executors.newFixedThreadPool(4);
                         Future<?> future = executor.submit(new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    controller.encode(fileEntry);            //        <-- your job
+                                    controller.encode();
+                                    //controller.write();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 } catch (TimeoutException e) {
@@ -52,54 +58,49 @@ public class Test {
                             }
                         });
 
-                        executor.shutdown();            //        <-- reject all further submissions
+                        executor.shutdown();            //        reject all further submissions
 
                         try {
-                            future.get(600, TimeUnit.SECONDS);  //     <-- wait seconds to finish
-                        } catch (InterruptedException e) {    //     <-- possible error cases
+                            future.get(5, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
+                        } catch (InterruptedException e) {    //     possible error cases
                             System.out.println("job was interrupted");
                         } catch (ExecutionException e) {
                             System.out.println("caught exception: " + e.getCause());
                         } catch (java.util.concurrent.TimeoutException e) {
-                            future.cancel(true);              //     <-- interrupt the job
+                            future.cancel(true);              //     interrupt the job
                             System.out.println("timeout");
-                            //executor.shutdownNow();
-                            executor.shutdown();
+                            controller.sat = "UNSAT";
+                            System.out.println("UNSAT");
+                            time = "time out";
                         }
-
                         // wait all unfinished tasks for sec
                         if(!executor.awaitTermination(1, TimeUnit.SECONDS)){
                             // force them to quit by interrupting
                             executor.shutdownNow();
                         }
-                        long t2 = System.currentTimeMillis();
-                        long time = (t2 - t1);
-                        res = Controller.inFoList();
-                        System.out.println("\nTotal Time: " + time + " ms");
+
+                        res = controller.inFoList();
+                        //System.out.println(res.get(TIME));
+                        if (time != "time out") {
+                            time = res.get(TIME);
+                            System.out.println("\nTotal Time: " + time + " ms");
+                        }
+
                         System.out.println("--------------------------------");
                         fileInfo += fileName + "\t" + res.get(ROWS) + "x" + res.get(COLS) + "\t" + res.get(MAX_NUM) + "\t"
-                                + res.get(VARS_NUM) + "\t" + res.get(CLAUSES_NUM) + "\t" + time;
+                                + res.get(VARS_NUM) + "\t" + res.get(CLAUSES_NUM) + "\t" + time+ "\t" + res.get(SAT);
                     }
-                    outputToTxt(fileInfo);
+                    Controller.outputToTxt(fileInfo, outFile);
                 }
             }
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, FileNotFoundException, TimeoutException {
         //new Test(300);
         listFilesForFolder(inFolder);
         //reformatInput(reformatFolder);
     }
 
-    private static void outputToTxt(String result) {
-        try {
-            FileWriter writer = new FileWriter(outFile, true);
-//            writer.write("Propagation:\n");
-            writer.write(result + "\n");
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 }
