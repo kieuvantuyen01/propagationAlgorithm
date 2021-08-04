@@ -6,6 +6,7 @@ import org.sat4j.specs.IProblem;
 import org.sat4j.specs.TimeoutException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -13,12 +14,32 @@ import java.util.*;
 public class Controller {
     private static CNFConverter cnfConverter = new CNFConverter();
     private static SATSolver satSolver;
+    static NumberLink numberLink = new NumberLink();
+    static IProblem problem = null;
+    static long clause = 0;
+    static long vars = 0;
+    static boolean satisfied = false;
+    static String sat = "UNSAT";
+    static String time = "";
+    static String parameters = "";
+    public static File outFile = new File("./output/log.txt");
+    private static String result;
 
+    public static List<String> inFoList() {
+        List<String> res = new ArrayList<>();
+        res.add(String.valueOf(numberLink.getRow()));
+        res.add(String.valueOf(numberLink.getCol()));
+        res.add(String.valueOf(numberLink.getMaxNum()));
+        res.add(String.valueOf(vars));
+        res.add(String.valueOf(clause));
+        res.add(time);
+        res.add(sat);
+        return res;
+    }
 
-    public List<Long> encode(File file) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
+    public static void read(File file) throws FileNotFoundException {
         List<Long> res = new ArrayList<>();
         Scanner sc = new Scanner(file);
-        NumberLink numberLink = new NumberLink();
 
         List<List<String>> matrix = new ArrayList<>();
         while (sc.hasNextLine()) {
@@ -27,26 +48,31 @@ public class Controller {
             matrix.add(arr);
         }
         sc.close();
-
-        numberLink.setRow(matrix.size());
-        numberLink.setCol(matrix.get(0).size());
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        numberLink.setRow(rows);
+        numberLink.setCol(cols);
 
         int[][] input = new int[numberLink.getRow() + 1][numberLink.getCol() + 1];
         for (int i = 1; i < numberLink.getRow() + 1; i++) {
             for (int j = 1; j < numberLink.getCol() + 1; j++) {
-                input[i][j] = Integer.parseInt(matrix.get(i-1).get(j-1));
+                input[i][j] = Integer.parseInt(matrix.get(i - 1).get(j - 1));
             }
         }
-
-        numberLink.setMaxNum(getMaxNum(input));
+        int maxNum = getMaxNum(input);
+        numberLink.setMaxNum(maxNum);
         numberLink.setInputs(input);
+        parameters = file.getName() + "\n" + "Kich thuoc ma tran: " + rows + "x" + cols + "\n"
+                + "Gia tri lon nhat: " + maxNum + "\n";
 
-        System.out.println("Kich thuoc ma tran: " + numberLink.getRow() + "x" + numberLink.getCol());
-        System.out.println("Gia tri lon nhat: " + numberLink.getMaxNum());
+        System.out.println(parameters);
 
         // in ra de bai
         System.out.println(numberLink);
+    }
 
+    public static void encode() throws IOException, TimeoutException, ParseFormatException, ContradictionException {
+        long t1 = System.currentTimeMillis();
         // Ghi ra file CNF
         File fileCNF = new File("text.cnf");
         FileWriter writer = new FileWriter(fileCNF);
@@ -54,8 +80,8 @@ public class Controller {
         //long t1 = System.currentTimeMillis();
         SatEncoding satEncoding = cnfConverter.generateSat(numberLink);
 
-        long clause = satEncoding.getClauses();
-        long vars = satEncoding.getVariables();
+        clause = satEncoding.getClauses();
+        vars = satEncoding.getVariables();
         String firstLine = "p cnf " + vars + " " + clause;
         System.out.println("So luong bien la: " + vars);
         System.out.println("So luong menh de la: " + clause);
@@ -77,31 +103,29 @@ public class Controller {
         DimacsReader reader = new DimacsReader(SolverFactory.newDefault());
         reader.parseInstance("text.cnf");
         satSolver = new SATSolver(reader);
-        IProblem problem = null;
-
-        //while (System.currentTimeMillis() < t1 + 360 * 1000) {
         problem = satSolver.solve("text.cnf");
-        //}
-        //long t2 = System.currentTimeMillis();
-        if (problem.isSatisfiable()) {
-            System.out.println("SAT");
+
+        satisfied = problem.isSatisfiable();
+        result = parameters + "\nSo luong bien la: " + vars + "\n" +
+                "So luong menh de la: " + clause + "\n" + numberLink + "\n";
+        String solution = "";
+        if (satisfied) {
             int[] model = problem.model();
-            printResult(model, numberLink);
-
-        }  else {
-            System.out.println("UNSAT");
+            sat = "SAT";
+            solution = printResult(model, numberLink);
+            result += solution;
+            System.out.println(solution);
+        } else {
+            sat = "UNSAT";
         }
-        res.add((long) numberLink.getRow());
-        res.add((long) numberLink.getCol());
-        res.add((long) numberLink.getMaxNum());
-        res.add(vars);
-        res.add(clause);
-
-        //res.add(t2-t1);
-        return res;
+        time = String.valueOf(System.currentTimeMillis() - t1);
+        System.out.println(sat);
+        result += "\n" + sat + "\n" + "Total time: " + time + "\n"
+                + "--------------------------------";
+        outputToTxt(result, outFile);
     }
 
-    private int getMaxNum(int[][] matrix) {
+    private static int getMaxNum(int[][] matrix) {
         int maxNum = 0;
         for (int i = 1; i < matrix.length; i++) {
             for (int j = 1; j < matrix[0].length; j++) {
@@ -114,27 +138,64 @@ public class Controller {
     }
 
 
-    private void printResult(int[] model, NumberLink numberLink) {
-        int countBreak = 0;
-        for (int k = 0; k < model.length; k++) {
-
-            if (model[k] > 0) {
-
-                int positionValue = model[k];
-                int i = cnfConverter.getValueOfYI(positionValue, numberLink);
-
-                int breakPoint = (i - 1) % numberLink.getCol();
-                int value = cnfConverter.getValueOfY(model[k], numberLink);
-
-                if (breakPoint == countBreak) {
-                    System.out.println();
-                    countBreak++;
-                }
-                if (value < 10) {
-                    System.out.print(" ");
-                }
-                System.out.print((value) + " ");
+    private static String printResult(int[] model, NumberLink numberLink) {
+        int maxNum = numberLink.getMaxNum();
+        String res = "";
+        List<List<Integer>> arr = new ArrayList<>();
+        int count = 0;
+        for (int i = 0; i < (model.length / maxNum); i++) {
+            List<Integer> cell = new ArrayList<>();
+            for (int j = 0; j < maxNum; j++) {
+                cell.add(model[count]);
+                count++;
             }
+            arr.add(cell);
+        }
+
+        count = 0;
+        for (int i = 0; i < arr.size(); i++) {
+            count++;
+            res += printValue(arr.get(i), maxNum);
+
+            if (count == numberLink.getCol()) {
+                /*System.out.println();*/
+                res += "\n";
+                count = 0;
+            }
+        }
+        return res;
+    }
+
+    private static String printValue(List<Integer> cell, int maxNum) {
+        String res = "";
+        boolean hasPositiveValue = false;
+        for (int i : cell) {
+            if (i > 0) {
+                hasPositiveValue = true;
+                int value = cnfConverter.getValueOfY(i, maxNum);
+                if (value < 10) {
+                    /*System.out.print(" ");*/
+                    res += " ";
+                }
+                /*System.out.print((value) + " ");*/
+                res += value + " ";
+            }
+        }
+        if (!hasPositiveValue) {
+            /*System.out.print(" - ");*/
+            res += " - ";
+        }
+
+        return res;
+    }
+
+    public static void outputToTxt(String result, File outFile) {
+        try {
+            FileWriter writer = new FileWriter(outFile, true);
+            writer.write(result + "\n");
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

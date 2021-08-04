@@ -6,11 +6,11 @@ import java.util.Scanner;
 
 
 public class GenerateTest {
-    public static File folder = new File("E:\\Lab\\Test cases");
+    public static File folder = new File("E:\\Lab\\TC");
     //Kich co toi da muon sinh Test
-    static int k = 35;
+    static int k = 45;
     //Kich co toi thieu muon sinh Test
-    static int l = 5;
+    static int l = 36;
     static Random rd = new Random();
 
     /*public static void deleteFile(File folder) {
@@ -28,7 +28,7 @@ public class GenerateTest {
         int im = 0;
         while (im++ < m) {
             File outputFile = new File(String.format("E:\\Lab\\Test cases\\%dx%d %d.in", n, n, im));
-            FileWriter writer = new FileWriter(outputFile, true);
+            FileWriter writer = new FileWriter(outputFile);
             /*writer.write(n + " " + n + "\n");
             writer.write(p + "\n");*/
             int a[][] = new int[n][n];
