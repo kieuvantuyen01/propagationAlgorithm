@@ -34,8 +34,6 @@ public class Test {
                     fileName = fileEntry.getName();
                     if ((fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase()).equals("in")) {
                         String time = "";
-                        System.out.println(fileName);
-
                         controller.read(fileEntry);
                         /*long t1 = System.currentTimeMillis();*/
 
@@ -61,7 +59,7 @@ public class Test {
                         executor.shutdown();            //        reject all further submissions
 
                         try {
-                            future.get(5, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
+                            future.get(900, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
                         } catch (InterruptedException e) {    //     possible error cases
                             System.out.println("job was interrupted");
                         } catch (ExecutionException e) {
