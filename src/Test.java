@@ -22,8 +22,7 @@ public class Test {
 
     static List<String> res;
 
-
-    public static void listFilesForFolder(final File folder) throws InterruptedException, FileNotFoundException, TimeoutException {
+    public static void listFilesForFolder(final File folder) throws InterruptedException, IOException, TimeoutException, ParseFormatException, ContradictionException {
         for (final File fileEntry : folder.listFiles()) {
             if (fileEntry.isDirectory()) {
                 listFilesForFolder(fileEntry);
@@ -36,15 +35,15 @@ public class Test {
                         String time = "";
                         controller.read(fileEntry);
                         /*long t1 = System.currentTimeMillis();*/
-
+/*
                         ExecutorService executor = Executors.newFixedThreadPool(4);
                         Future<?> future = executor.submit(new Runnable() {
                             @Override
                             public void run() {
-                                try {
+                                try {*/
                                     controller.encode();
                                     //controller.write();
-                                } catch (IOException e) {
+/*                                } catch (IOException e) {
                                     e.printStackTrace();
                                 } catch (TimeoutException e) {
                                     e.printStackTrace();
@@ -59,7 +58,7 @@ public class Test {
                         executor.shutdown();            //        reject all further submissions
 
                         try {
-                            future.get(900, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
+                            future.get(5, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
                         } catch (InterruptedException e) {    //     possible error cases
                             System.out.println("job was interrupted");
                         } catch (ExecutionException e) {
@@ -75,7 +74,7 @@ public class Test {
                         if(!executor.awaitTermination(1, TimeUnit.SECONDS)){
                             // force them to quit by interrupting
                             executor.shutdownNow();
-                        }
+                        }*/
 
                         res = controller.inFoList();
                         //System.out.println(res.get(TIME));
@@ -94,11 +93,9 @@ public class Test {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException, FileNotFoundException, TimeoutException {
+    public static void main(String[] args) throws InterruptedException, IOException, TimeoutException, ParseFormatException, ContradictionException {
         //new Test(300);
         listFilesForFolder(inFolder);
         //reformatInput(reformatFolder);
     }
-
-
 }
