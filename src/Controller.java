@@ -141,6 +141,8 @@ public class Controller {
     private static String printResult(int[] model, NumberLink numberLink) {
         int maxNum = numberLink.getMaxNum();
         String res = "";
+        int x_vars = numberLink.getRow() * numberLink.getCol() * numberLink.getMaxNum();
+        model = Arrays.copyOfRange(model, 0, x_vars+1);
         List<List<Integer>> arr = new ArrayList<>();
         int count = 0;
         for (int i = 0; i < (model.length / maxNum); i++) {
