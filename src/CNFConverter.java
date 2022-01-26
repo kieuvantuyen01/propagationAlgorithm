@@ -88,7 +88,7 @@ public class CNFConverter {
     */
     public static List<String> generateBinaryStrings(int n) {
         List<String> stringPermutations = new ArrayList<>();
-        int permutations = (int)Math.pow(2, n);
+        int permutations = (int) Math.pow(2, n);
 
         for (int bits = 0; bits < permutations; bits++) {
             String permutation = convert(bits, n);
@@ -113,12 +113,11 @@ public class CNFConverter {
     }
 
     public static String reverseString(String str) {
-        String nstr="";
+        String nstr = "";
         char ch;
-        for (int i=0; i<str.length(); i++)
-        {
-            ch= str.charAt(i); //extracts each character
-            nstr= ch+nstr; //adds each character in front of the existing string
+        for (int i = 0; i < str.length(); i++) {
+            ch = str.charAt(i); //extracts each character
+            nstr = ch + nstr; //adds each character in front of the existing string
         }
         return nstr;
     }
@@ -127,7 +126,7 @@ public class CNFConverter {
         m_limit[DOWN] = numberLink.getRow();
         m_limit[RIGHT] = numberLink.getCol();
         int max_num = numberLink.getMaxNum();
-        int adding_vars = (int)Math.ceil((Math.log(max_num) / Math.log(2)));
+        int adding_vars = (int) Math.ceil((Math.log(max_num) / Math.log(2)));
         int[][] inputs = numberLink.getInputs();
         int variables = 0;
         int clauses = 0;
@@ -164,7 +163,7 @@ public class CNFConverter {
                 }
             }
         }
-        variables = numberLink.getRow() * numberLink.getCol() * (numberLink.getMaxNum() + adding_vars);
+        variables = numberLink.getRow() * numberLink.getCol() * (numberLink.getMaxNum()) + adding_vars * numberLink.getMaxNum();
         return new SatEncoding(rules, clauses, variables);
     }
 
@@ -263,14 +262,14 @@ public class CNFConverter {
 //        String tmpClause = "onlyOneValue";
 //        resultStringList.add(tmpClause);
         int max_num = numberLink.getMaxNum();
-        int adding_vars = (int)Math.ceil((Math.log(max_num) / Math.log(2)));
-        List<String> binaryStrings =  generateBinaryStrings(adding_vars);
+        int adding_vars = (int) Math.ceil((Math.log(max_num) / Math.log(2)));
+        List<String> binaryStrings = generateBinaryStrings(adding_vars);
         // cắt bớt, chỉ lấy n = max_num xâu
         binaryStrings = binaryStrings.subList(0, max_num);
 
         for (int k = 1; k <= max_num; k++) {
 
-            String binary = binaryStrings.get(k-1);
+            String binary = binaryStrings.get(k - 1);
             binary = reverseString(binary);
             for (int q = max_num + 1; q <= max_num + adding_vars; q++) {
                 String clause = "";
@@ -331,11 +330,11 @@ public class CNFConverter {
     private int computePosition(int i, int j, int value, NumberLink numberLink) {
         int n = numberLink.getCol();
         int max_num = numberLink.getMaxNum();
-        int adding_vars = (int)Math.ceil((Math.log(max_num) / Math.log(2)));
+        int adding_vars = (int) Math.ceil((Math.log(max_num) / Math.log(2)));
         int X_vars = numberLink.getRow() * numberLink.getCol() * numberLink.getMaxNum();
         if (value <= max_num)
             return n * (i - 1) * max_num + (j - 1) * max_num + value;
-        else return X_vars + n * (i - 1) * (max_num + adding_vars) + (j - 1) * (max_num + adding_vars) + value;
+        return X_vars + n * (i - 1) * (adding_vars) + (j - 1) * (adding_vars) + value;
     }
 
 
@@ -361,8 +360,13 @@ public class CNFConverter {
         }
     }
 
-    public int getValueOfY(int positionValue, int maxNum) {
-        return (positionValue - 1) % maxNum + 1;
+    public int getValueOfY(int positionValue, int maxNum, NumberLink numberLink) {
+        int rows = numberLink.getRow();
+        int cols = numberLink.getCol();
+        if (positionValue <= rows * cols * maxNum) {
+            return (positionValue - 1) % maxNum + 1;
+        }
+        return -1;
     }
 
     public int getValueOfYJ(int positionValue, NumberLink numberLink) {

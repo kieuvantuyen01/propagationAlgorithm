@@ -141,8 +141,6 @@ public class Controller {
     private static String printResult(int[] model, NumberLink numberLink) {
         int maxNum = numberLink.getMaxNum();
         String res = "";
-        int x_vars = numberLink.getRow() * numberLink.getCol() * numberLink.getMaxNum();
-        model = Arrays.copyOfRange(model, 0, x_vars+1);
         List<List<Integer>> arr = new ArrayList<>();
         int count = 0;
         for (int i = 0; i < (model.length / maxNum); i++) {
@@ -174,13 +172,15 @@ public class Controller {
         for (int i : cell) {
             if (i > 0) {
                 hasPositiveValue = true;
-                int value = cnfConverter.getValueOfY(i, maxNum);
-                if (value < 10) {
-                    /*System.out.print(" ");*/
-                    res += " ";
+                int value = cnfConverter.getValueOfY(i, maxNum, numberLink);
+                if (value > 0) {
+                    if (value < 10) {
+                        /*System.out.print(" ");*/
+                        res += " ";
+                    }
+                    /*System.out.print((value) + " ");*/
+                    res += value + " ";
                 }
-                /*System.out.print((value) + " ");*/
-                res += value + " ";
             }
         }
         if (!hasPositiveValue) {
