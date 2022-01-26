@@ -163,7 +163,8 @@ public class CNFConverter {
                 }
             }
         }
-        variables = numberLink.getRow() * numberLink.getCol() * (numberLink.getMaxNum()) + adding_vars * numberLink.getMaxNum();
+        variables = m_limit[DOWN] * m_limit[RIGHT] * max_num +
+                adding_vars * (m_limit[DOWN] * m_limit[RIGHT] - max_num * 2);
         return new SatEncoding(rules, clauses, variables);
     }
 
@@ -331,10 +332,10 @@ public class CNFConverter {
         int n = numberLink.getCol();
         int max_num = numberLink.getMaxNum();
         int adding_vars = (int) Math.ceil((Math.log(max_num) / Math.log(2)));
-        int X_vars = numberLink.getRow() * numberLink.getCol() * numberLink.getMaxNum();
+        int X_vars = numberLink.getRow() * numberLink.getCol() * max_num;
         if (value <= max_num)
             return n * (i - 1) * max_num + (j - 1) * max_num + value;
-        return X_vars + n * (i - 1) * (adding_vars) + (j - 1) * (adding_vars) + value;
+        return X_vars + n * (i - 1) * adding_vars + (j - 1) * adding_vars + value;
     }
 
 
