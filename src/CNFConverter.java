@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.lang.Math;
 
 public class CNFConverter {
     public static final int LEFT = 1;
@@ -80,9 +82,52 @@ public class CNFConverter {
         return res;
     }
 
+    /*
+    return binary strings with fixed length.
+    i.e n=2 [00, 01, 10, 11]
+    */
+    public static List<String> generateBinaryStrings(int n) {
+        List<String> stringPermutations = new ArrayList<>();
+        int permutations = (int)Math.pow(2, n);
+
+        for (int bits = 0; bits < permutations; bits++) {
+            String permutation = convert(bits, n);
+            stringPermutations.add(permutation);
+        }
+        Collections.sort(stringPermutations);
+        return stringPermutations;
+    }
+
+    public static String convert(int bits, int n) {
+        String conversion = "";
+        while (n-- > 0) {
+            int bit = bits & 1; // Retrieves the rightmost bit
+            if (bit == 0) {
+                conversion += "0";
+            } else {
+                conversion += "1";
+            }
+            bits >>= 1; // Removes the rightmost bit.
+        }
+        return conversion;
+    }
+
+    public static String reverseString(String str) {
+        String nstr="";
+        char ch;
+        for (int i=0; i<str.length(); i++)
+        {
+            ch= str.charAt(i); //extracts each character
+            nstr= ch+nstr; //adds each character in front of the existing string
+        }
+        return nstr;
+    }
+
     public SatEncoding generateSat(NumberLink numberLink) {
         m_limit[DOWN] = numberLink.getRow();
         m_limit[RIGHT] = numberLink.getCol();
+        int max_num = numberLink.getMaxNum();
+        int adding_vars = (int)Math.ceil((Math.log(max_num) / Math.log(2)));
         int[][] inputs = numberLink.getInputs();
         int variables = 0;
         int clauses = 0;
@@ -107,6 +152,7 @@ public class CNFConverter {
                     // blank cell
                 } else {
                     List<String> baseRule1 = onlyOneValue(i, j, numberLink);
+
                     clauses += baseRule1.size();
                     rules.addAll(baseRule1);
 
@@ -118,7 +164,7 @@ public class CNFConverter {
                 }
             }
         }
-        variables = numberLink.getRow() * numberLink.getCol() * numberLink.getMaxNum();
+        variables = numberLink.getRow() * numberLink.getCol() * (numberLink.getMaxNum() + adding_vars);
         return new SatEncoding(rules, clauses, variables);
     }
 
@@ -214,24 +260,44 @@ public class CNFConverter {
 
     private List<String> onlyOneValue(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
-        //String tmpClause = "onlyOneValue";
-        //resultStringList.add(tmpClause);
-        String exactNumLine = "";
+//        String tmpClause = "onlyOneValue";
+//        resultStringList.add(tmpClause);
+        int max_num = numberLink.getMaxNum();
+        int adding_vars = (int)Math.ceil((Math.log(max_num) / Math.log(2)));
+        List<String> binaryStrings =  generateBinaryStrings(adding_vars);
+        // cắt bớt, chỉ lấy n = max_num xâu
+        binaryStrings = binaryStrings.subList(0, max_num);
 
-//        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
+        for (int k = 1; k <= max_num; k++) {
+
+            String binary = binaryStrings.get(k-1);
+            binary = reverseString(binary);
+            for (int q = max_num + 1; q <= max_num + adding_vars; q++) {
+                String clause = "";
+                // -X v
+                clause += -computePosition(i, j, k, numberLink) + " ";
+                char bit = binary.charAt(q - max_num - 1);
+                if (bit == '0') {
+                    // -Y
+                    clause += -computePosition(i, j, q, numberLink) + " ";
+                } else {
+                    // Y
+                    clause += computePosition(i, j, q, numberLink) + " ";
+                }
+                clause += "0";
+                resultStringList.add(clause);
+            }
+        }
+
+//        String tmpClause2 = "end";
+//        resultStringList.add(tmpClause2);
+
+        //        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
 //            exactNumLine += computePosition(i, j, k, numberLink) + " ";
 //        }
 //        exactNumLine += "0";
 //        resultStringList.add(exactNumLine);
 
-        for (int k = 1; k <= numberLink.getMaxNum() - 1; k++) {
-            String firstClause = -computePosition(i, j, k, numberLink) + " ";
-            for (int q = k + 1; q <= numberLink.getMaxNum(); q++) {
-                String secondClause = -computePosition(i, j, q, numberLink) + " ";
-                secondClause += "0";
-                resultStringList.add(firstClause + secondClause);
-            }
-        }
         return resultStringList;
     }
 
@@ -264,7 +330,12 @@ public class CNFConverter {
 
     private int computePosition(int i, int j, int value, NumberLink numberLink) {
         int n = numberLink.getCol();
-        return n * (i - 1) * numberLink.getMaxNum() + (j - 1) * numberLink.getMaxNum() + value;
+        int max_num = numberLink.getMaxNum();
+        int adding_vars = (int)Math.ceil((Math.log(max_num) / Math.log(2)));
+        int X_vars = numberLink.getRow() * numberLink.getCol() * numberLink.getMaxNum();
+        if (value <= max_num)
+            return n * (i - 1) * max_num + (j - 1) * max_num + value;
+        else return X_vars + n * (i - 1) * (max_num + adding_vars) + (j - 1) * (max_num + adding_vars) + value;
     }
 
 
