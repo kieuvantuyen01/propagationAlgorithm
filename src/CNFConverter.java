@@ -55,7 +55,9 @@ public class CNFConverter {
                 if (inputs[i][j] != 0) {
 
                     List<String> rule0 = valueFromInput(i, j, inputs[i][j], numberLink);
+//                    System.out.println("Rule 0" + rule0);
                     List<String> rule1 = notValuesFromInput(i, j, inputs[i][j], numberLink);
+                    System.out.println("Rule 1" + rule1);
                     clauses += rule1.size();
                     rules.addAll(rule1);
                     List<String> rule2;
@@ -82,7 +84,7 @@ public class CNFConverter {
 
                     rules.addAll(rule0);
                     rules.addAll(rule2);
-
+//                    System.out.println("Rule 2" + rule2);
                     // blank cell
                 } else {
                     List<String> baseRule1 = onlyOneValue(i, j, numberLink);
@@ -113,6 +115,7 @@ public class CNFConverter {
                     clauses += rule2.size();
 
                     rules.addAll(rule2);
+//                    System.out.println("Rule 2" + rule2);
                 }
 
             }
@@ -212,8 +215,7 @@ public class CNFConverter {
             }
         }*/
         return resultStringList;
-    }
-
+    } 
 
     private List<String> exact_one_direction(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
