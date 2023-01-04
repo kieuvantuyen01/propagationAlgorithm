@@ -235,3 +235,24 @@ So luong menh de la: 504
 SAT
 Total time: 157
 --------------------------------
+5x5 1.in
+Kich thuoc ma tran: 5x5
+Gia tri lon nhat: 4
+
+So luong bien la: 100
+So luong menh de la: 504
+0 3 0 0 3  
+0 0 2 0 1  
+0 0 4 4 0  
+0 1 0 0 0  
+0 0 0 2 0  
+
+ -  3  3  3  3 
+ 2  2  2  -  1 
+ 2  -  4  4  1 
+ 2  1  1  1  1 
+ 2  2  2  2  - 
+
+SAT
+Total time: 141
+--------------------------------
