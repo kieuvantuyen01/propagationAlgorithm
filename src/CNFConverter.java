@@ -43,6 +43,9 @@ public class CNFConverter {
         return (i == 1 && (j > 1 && j < m_limit[RIGHT]));
     }
 
+    // Tồn tại duy nhất = tối đa + tối thiểu
+
+    // Các ô liền kề với ô đang xét
     List<Integer> adjacentCells(int i, int j, int value, NumberLink numberLink) {
         List<Integer> res = new ArrayList<>();
         if (isLUCornerCell(i, j)) {
@@ -85,11 +88,15 @@ public class CNFConverter {
     /*
     return binary strings with fixed length.
     i.e n=2 [00, 01, 10, 11]
+    n = [log2(num of old variables)]
     */
     public static List<String> generateBinaryStrings(int n) {
         List<String> stringPermutations = new ArrayList<>();
+        // number of permutations is 2^n (represented in binary by 2 bits 0 and 1)
         int permutations = (int) Math.pow(2, n);
 
+
+        // Sinh du "permutations" chuoi nhi phan
         for (int bits = 0; bits < permutations; bits++) {
             String permutation = convert(bits, n);
             stringPermutations.add(permutation);
@@ -107,11 +114,28 @@ public class CNFConverter {
             } else {
                 conversion += "1";
             }
+
+            // >> means signed right shift
             bits >>= 1; // Removes the rightmost bit.
         }
         return conversion;
     }
 
+    /*
+    * bits = 0 --> bit = 0 & 1 = 0 --> conversion = 0 --> bits = 0 >> 1 = 0 --> bit = 0 & 1 = 0 --> conversion = 00
+    * bits = 1 --> bit = 1 & 1 = 1 --> conversion = 1 --> bits = 1 >> 1 = 0 --> bit = 0 & 1 = 0 --> conversion = 10
+    * bits = 2 --> bit = 2 & 1 = 0 --> conversion = 0 --> bits = 2 >> 1 = 1 --> bit = 1 & 1 = 1 --> conversion = 01
+    * bits = 3 --> bit = 3 & 1 = 1 --> conversion = 1 --> bits = 3 >> 1 = 1 --> bit = 1 & 1 = 1 --> conversion = 11
+    * stringPermutations = [00, 01, 10, 11]
+    * */
+    // q: why the result of even number AND 1 is 0?
+    // a: because the rightmost bit of even number is 0, so the result of AND 1 is 0
+    // q: why we have to remove the rightmost bit in line 117?
+    // a: because we have to check the next bit of the number
+
+
+
+    // i.e.
     public static String reverseString(String str) {
         String nstr = "";
         char ch;
@@ -127,6 +151,7 @@ public class CNFConverter {
         m_limit[RIGHT] = numberLink.getCol();
         int max_num = numberLink.getMaxNum();
         int adding_vars = (int) Math.ceil((Math.log(max_num) / Math.log(2)));
+        // Math.log(max_num) / Math.log(2) = log2(max_num)
         int[][] inputs = numberLink.getInputs();
         int variables = 0;
         int clauses = 0;
@@ -168,6 +193,7 @@ public class CNFConverter {
         return new SatEncoding(rules, clauses, variables);
     }
 
+
     private List<String> has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 
@@ -176,6 +202,9 @@ public class CNFConverter {
             firstClause = -computePosition(i, j, k, numberLink) + " ";
             List<Integer> adjacentCells = adjacentCells(i, j, k, numberLink);
             int numCells = adjacentCells.size();
+            // numCells == 2: ô ở vị trí góc
+            // numCells == 3: ô ở vị trí biên
+            // numCells == 4: ô ở các vị trí còn lại
             if (numCells == 2) {
                 for (int z = 0; z <= numCells - 1; z++) {
                     String tmp2 = firstClause + adjacentCells.get(z) + " ";

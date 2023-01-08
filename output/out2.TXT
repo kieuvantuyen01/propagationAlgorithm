@@ -193,3 +193,12 @@
 14x14 1.in	14x14	16	3792	29590	625	SAT
 15x15 1.in	15x15	17	4780	39375	468	SAT
 5x5 1.in	5x5	4	134	538	141	SAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
+5x5 1.in	5x5	4	0	0	time out	UNSAT
