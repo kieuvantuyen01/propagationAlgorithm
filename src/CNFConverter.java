@@ -8,7 +8,6 @@ public class CNFConverter {
     public static final int RIGHT = 2;
     public static final int UP = 3;
     public static final int DOWN = 4;
-    //    public static final int[] DIR = new int[]{ -1000, -1, 1};
     public static int[] m_limit = new int[]{0, 1, 10, 1, 10};
 
     boolean isLUCornerCell(int i, int j) {
@@ -188,12 +187,15 @@ public class CNFConverter {
                 }
             }
         }
+
         variables = m_limit[DOWN] * m_limit[RIGHT] * max_num +
                 adding_vars * (m_limit[DOWN] * m_limit[RIGHT] - max_num * 2);
+        // adding_vars * (m_limit[DOWN] * m_limit[RIGHT] - max_num * 2) --> for blank cells (not cells have number)
         return new SatEncoding(rules, clauses, variables);
     }
 
 
+    // Blank cells have two directions
     private List<String> has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 
@@ -202,7 +204,7 @@ public class CNFConverter {
             firstClause = -computePosition(i, j, k, numberLink) + " ";
             List<Integer> adjacentCells = adjacentCells(i, j, k, numberLink);
             int numCells = adjacentCells.size();
-            // numCells == 2: ô ở vị trí góc
+            // numCells == 2: ô ở vị trí góc --> (-Xijk v Xi(j+1)k) ^ (-Xijk v X(i+1)jk)
             // numCells == 3: ô ở vị trí biên
             // numCells == 4: ô ở các vị trí còn lại
             if (numCells == 2) {
@@ -212,6 +214,8 @@ public class CNFConverter {
                     resultStringList.add(tmp2);
                 }
             } else if (numCells == 3) {
+                // 2 trong 3 hướng đi: (-Xijk v Xi(j-1)k v Xi(j+1)k) ^ (-Xijk v Xi(j-1)k v X(i+1)jk) ^ (-Xijk v X(i+1)jk v Xi(j+1)k)
+                // At least 2 in 3 are TRUE
                 for (int t = 0; t <= numCells - 2; t++) {
                     String tmp1 = firstClause + adjacentCells.get(t) + " ";
                     for (int z = t + 1; z <= numCells - 1; z++) {
@@ -221,13 +225,24 @@ public class CNFConverter {
                     }
                 }
             } else if (numCells == 4) {
+                // 2 trong 4 hướng đi: -Xijk v X(i+1)jk v Xi(j+1)k v
+                // At least 2 in 4 are TRUE
                 for (int q = 0; q <= numCells - 3; q++) {
                     String tmp0 = firstClause + adjacentCells.get(q) + " ";
+                    // tmp0 = -Xijk v X(i+1)jk, q = 0
+                    // tmp0 = -Xijk v Xi(j+1)k, q = 1
                     for (int t = q + 1; t <= numCells - 2; t++) {
                         String tmp1 = tmp0 + adjacentCells.get(t) + " ";
+                        // tmp1 = -Xijk v X(i+1)jk v Xi(j+1)k, q = 0 t = 1
+                        // tmp1 = -Xijk v X(i+1)jk v X(i-1)jk, q = 0 t = 2
+                        // tmp1 = -Xijk v Xi(j+1)k v X(i-1)jk, q = 1 t = 2
                         for (int z = t + 1; z <= numCells - 1; z++) {
                             String tmp2 = tmp1 + adjacentCells.get(z) + " ";
                             tmp2 += "0";
+                            // tmp2 = -Xijk v X(i+1)jk v Xi(j+1)k v X(i-1)jk, q = 0 t = 1 z = 2
+                            // tmp2 = -Xijk v X(i+1)jk v Xi(j+1)k v Xi(j-1)k, q = 0 t = 1 z = 3
+                            // tmp2 = -Xijk v X(i+1)jk v X(i-1)jk v Xi(j-1)k, q = 0 t = 2 z = 3
+                            // tmp2 = -Xijk v Xi(j+1)k v X(i-1)jk v Xi(j-1)k, q = 1 t = 2 z = 3
                             resultStringList.add(tmp2);
                         }
                     }
@@ -235,26 +250,46 @@ public class CNFConverter {
             }
         }
 
-        //
+
+//        UEdge: ←, ↓, →
+//        res.add(computePosition(i, j - 1, value, numberLink));
+//        res.add(computePosition(i, j + 1, value, numberLink));
+//        res.add(computePosition(i + 1, j, value, numberLink));
 
         for (int k = 1; k <= numberLink.getMaxNum(); k++) {
             firstClause = -computePosition(i, j, k, numberLink) + " ";
             List<Integer> adjacentCells = adjacentCells(i, j, k, numberLink);
             int numCells = adjacentCells.size();
             if (numCells == 3) {
+//              At most 2 in 3 are TRUE
                 String tmp2 = firstClause;
                 for (int z = 0; z <= numCells - 1; z++) {
                     tmp2 += (-adjacentCells.get(z)) + " ";
+                    // tmp2 = -Xijk v -Xi(j-1)k v -Xi(j+1)k v -X(i+1)jk
                 }
                 tmp2 += "0";
                 resultStringList.add(tmp2);
             } else if (numCells == 4) {
+//              At most 2 in 4 are TRUE
+//              res.add(computePosition(i + 1, j, value, numberLink));   0
+//              res.add(computePosition(i, j + 1, value, numberLink));   1
+//              res.add(computePosition(i - 1, j, value, numberLink));   2
+//              res.add(computePosition(i, j - 1, value, numberLink));   3
                 for (int q = 0; q <= numCells - 3; q++) {
                     String tmp0 = firstClause + (-adjacentCells.get(q)) + " ";
+                    // tmp0 = -Xijk v -X(i+1)jk, q = 0
+                    // tmp0 = -Xijk v -Xi(j+1)k, q = 1
                     for (int t = q + 1; t <= numCells - 2; t++) {
                         String tmp1 = tmp0 + (-adjacentCells.get(t)) + " ";
+                        // tmp1 = -Xijk v -X(i+1)jk v -Xi(j+1)k, q = 0 t = 1
+                        // tmp1 = -Xijk v -X(i+1)jk v -X(i-1)jk, q = 0 t = 2
+                        // tmp1 = -Xijk v -Xi(j+1)k v -X(i-1)jk, q = 1 t = 2
                         for (int z = t + 1; z <= numCells - 1; z++) {
                             String tmp2 = tmp1 + (-adjacentCells.get(z)) + " ";
+                            // tmp2 = -Xijk v -X(i+1)jk v -Xi(j+1)k v -X(i-1)jk, q = 0 t = 1 z = 2
+                            // tmp2 = -Xijk v -X(i+1)jk v -Xi(j+1)k v -Xi(j-1)k, q = 0 t = 1 z = 3
+                            // tmp2 = -Xijk v -X(i+1)jk v -X(i-1)jk v -Xi(j-1)k, q = 0 t = 2 z = 3
+                            // tmp2 = -Xijk v -Xi(j+1)k v -X(i-1)jk v -Xi(j-1)k, q = 1 t = 2 z = 3
                             tmp2 += "0";
                             resultStringList.add(tmp2);
                         }
@@ -265,46 +300,60 @@ public class CNFConverter {
         return resultStringList;
     }
 
+
+    // for numbered cells
     private List<String> exact_one_direction(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
         List<Integer> adjacentCells = adjacentCells(i, j, numberLink.getInputs()[i][j], numberLink);
         String firstClause = "";
+        // AT LEAST 1 is TRUE
         for (int value : adjacentCells) {
             firstClause += value + " ";
         }
         firstClause += "0";
         resultStringList.add(firstClause);
 
-        //
+        // AT MOST 1 is TRUE --> tại sao không dùng công thức dựa trên biến mới như trong slides thầy Khánh?
+        // cannot calculate adding_vars for numbered cells --> use this method
         int numCells = adjacentCells.size();
         for (int k = 0; k <= numCells - 2; k++) {
             String secondClause = -adjacentCells.get(k) + " ";
+            // secondClause = -Xi(j-1)k, k = 0
+            // secondClause = -Xi(j+1)k, k = 1
             for (int q = k + 1; q <= numCells - 1; q++) {
                 String tmp = secondClause + (-adjacentCells.get(q)) + " 0";
+                // tmp = -Xi(j-1)k v -Xi(j+1)k, k = 0 q = 1
+                // tmp = -Xi(j-1)k v -X(i-1)jk, k = 0 q = 2
+                // tmp = -Xi(j+1)k v -X(i-1)jk, k = 1 q = 2
                 resultStringList.add(tmp);
             }
         }
         return resultStringList;
     }
 
+    // For blank cells: at most one value is TRUE in each blank cell
     private List<String> onlyOneValue(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 //        String tmpClause = "onlyOneValue";
 //        resultStringList.add(tmpClause);
-        int max_num = numberLink.getMaxNum();
-        int adding_vars = (int) Math.ceil((Math.log(max_num) / Math.log(2)));
+        int max_num = numberLink.getMaxNum(); // max_num = 4 (5x5 1.in)
+        int adding_vars = (int) Math.ceil((Math.log(max_num) / Math.log(2))); // adding_vars = log2(4) = 2
         List<String> binaryStrings = generateBinaryStrings(adding_vars);
+        // binaryStrings = ["00", "01", "10", "11"]
         // cắt bớt, chỉ lấy n = max_num xâu
         binaryStrings = binaryStrings.subList(0, max_num);
+        // binaryStrings = ["00", "01", "10", "11"]
 
-        for (int k = 1; k <= max_num; k++) {
+        for (int k = 1; k <= max_num; k++) { // k = 1 --> 4
 
             String binary = binaryStrings.get(k - 1);
             binary = reverseString(binary);
-            for (int q = max_num + 1; q <= max_num + adding_vars; q++) {
+            // binary = "00"
+            for (int q = max_num + 1; q <= max_num + adding_vars; q++) {  // q = 5 --> 6
                 String clause = "";
                 // -X v
                 clause += -computePosition(i, j, k, numberLink) + " ";
+                // clause = -Xijk
                 char bit = binary.charAt(q - max_num - 1);
                 if (bit == '0') {
                     // -Y
@@ -330,8 +379,10 @@ public class CNFConverter {
         return resultStringList;
     }
 
+    // For numbered cells: only the existed value is TRUE
     private List<String> valueFromInput(int i, int j, int num, NumberLink numberLink) {
         int result = computePosition(i, j, num, numberLink);
+        // result = Xijk (k represents for numbered cell's value)
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "valueFromInput";
         //resultStringList.add(tmpClause);
@@ -343,6 +394,7 @@ public class CNFConverter {
         return resultStringList;
     }
 
+    // For numbered cells: other values which are different from the existed one are FALSE
     private List<String> notValuesFromInput(int i, int j, int num, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
 //        String firstClause = -computePosition(i, j, num, numberLink) + " ";
@@ -365,29 +417,7 @@ public class CNFConverter {
         if (value <= max_num)
             return n * (i - 1) * max_num + (j - 1) * max_num + value;
         return X_vars + n * (i - 1) * adding_vars + (j - 1) * adding_vars + value;
-    }
-
-
-    public int getValueOf(int row, int col, int positionValue, NumberLink numberLink) {
-        int n = numberLink.getCol();
-        if (positionValue <= n * (n - 1)) {
-            int JValue = (positionValue - 1) % (n - 1) + 1;
-            if (JValue == col) {
-                return RIGHT;
-            } else if (JValue + 1 == col) {
-                return LEFT;
-            } else return 100;
-        } else if (positionValue <= 2 * n * (n - 1)) {
-            int IValue = (positionValue - n * (n - 1) - 1) % (n - 1) + 1;
-            if (IValue == row) {
-                return DOWN;
-            } else if (IValue + 1 == row) {
-                return UP;
-            } else return 100;
-        } else {
-            int tmp = (positionValue - 2 * n * (n - 1 - 1)) % numberLink.getMaxNum() + 1;
-            return ((positionValue - 2 * n * (n - 1) - tmp) / numberLink.getMaxNum() + 1 - col) / n + 1;
-        }
+        // X_vars = row * col * max_num = 5 * 5 * 4 = 100
     }
 
     public int getValueOfY(int positionValue, int maxNum, NumberLink numberLink) {
@@ -398,14 +428,4 @@ public class CNFConverter {
         }
         return -1;
     }
-
-    public int getValueOfYJ(int positionValue, NumberLink numberLink) {
-        return ((positionValue - 1) / numberLink.getMaxNum()) % numberLink.getCol() + 1;
-    }
-
-    public int getValueOfYI(int positionValue, NumberLink numberLink) {
-        positionValue = Math.abs(positionValue);
-        return (positionValue - 1) / (numberLink.getMaxNum() * numberLink.getCol()) + 1;
-    }
-
 }
