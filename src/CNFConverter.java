@@ -57,7 +57,6 @@ public class CNFConverter {
                     List<String> rule0 = valueFromInput(i, j, inputs[i][j], numberLink);
 //                    System.out.println("Rule 0" + rule0);
                     List<String> rule1 = notValuesFromInput(i, j, inputs[i][j], numberLink);
-                    System.out.println("Rule 1" + rule1);
                     clauses += rule1.size();
                     rules.addAll(rule1);
                     List<String> rule2;
