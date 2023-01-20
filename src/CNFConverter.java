@@ -344,6 +344,7 @@ public class CNFConverter {
         binaryStrings = binaryStrings.subList(0, max_num);
         // binaryStrings = ["00", "01", "10", "11"]
 
+        // AMO
         for (int k = 1; k <= max_num; k++) { // k = 1 --> 4
 
             String binary = binaryStrings.get(k - 1);
@@ -367,14 +368,14 @@ public class CNFConverter {
             }
         }
 
-//        String tmpClause2 = "end";
-//        resultStringList.add(tmpClause2);
+        // ALO
+        String ALOclause = "";
+        for (int k = 1; k <= max_num; k++) {
+            ALOclause += computePosition(i, j, k, numberLink) + " ";
+        }
+        ALOclause += "0";
+        resultStringList.add(ALOclause);
 
-        //        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
-//            exactNumLine += computePosition(i, j, k, numberLink) + " ";
-//        }
-//        exactNumLine += "0";
-//        resultStringList.add(exactNumLine);
 
         return resultStringList;
     }
