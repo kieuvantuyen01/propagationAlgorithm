@@ -1,11 +1,4 @@
-
-*.in
-output/out2.TXT
-text.cnf
-out/production/PropagationAlgorithm/Test$RemindTask.class
-out/production/PropagationAlgorithm/Test.class
-out/production/PropagationAlgorithm/Test.class
-output/log.txt
-output/out2.TXT
-text.cnf
-text.cnf
+.idea
+inp
+PropagationAlgorithm.iml
+text.cnfg
