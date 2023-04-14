@@ -1,7 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.lang.Math;
 
 public class CNFConverter {
     public static final int LEFT = 1;
@@ -9,6 +9,55 @@ public class CNFConverter {
     public static final int UP = 3;
     public static final int DOWN = 4;
     public static int[] m_limit = new int[]{0, 1, 10, 1, 10};
+    int[][] source = new int[100][2];
+    int[][] target = new int[100][2];
+
+    /*
+    return binary strings with fixed length.
+    i.e n=2 [00, 01, 10, 11]
+    n = [log2(num of old variables)]
+    */
+    public static List<String> generateBinaryStrings(int n) {
+        List<String> stringPermutations = new ArrayList<>();
+        // number of permutations is 2^n (represented in binary by 2 bits 0 and 1)
+        int permutations = (int) Math.pow(2, n);
+
+
+        // Sinh du "permutations" chuoi nhi phan
+        for (int bits = 0; bits < permutations; bits++) {
+            String permutation = convert(bits, n);
+            stringPermutations.add(permutation);
+        }
+        Collections.sort(stringPermutations);
+        return stringPermutations;
+    }
+
+    public static String convert(int bits, int n) {
+        String conversion = "";
+        while (n-- > 0) {
+            int bit = bits & 1; // Retrieves the rightmost bit
+            if (bit == 0) {
+                conversion += "0";
+            } else {
+                conversion += "1";
+            }
+
+            // >> means signed right shift
+            bits >>= 1; // Removes the rightmost bit.
+        }
+        return conversion;
+    }
+
+    // i.e.
+    public static String reverseString(String str) {
+        String nstr = "";
+        char ch;
+        for (int i = 0; i < str.length(); i++) {
+            ch = str.charAt(i); //extracts each character
+            nstr = ch + nstr; //adds each character in front of the existing string
+        }
+        return nstr;
+    }
 
     boolean isLUCornerCell(int i, int j) {
         return (i == 1 && j == 1);
@@ -30,6 +79,8 @@ public class CNFConverter {
         return (j == 1 && (i > 1 && i < m_limit[DOWN]));
     }
 
+    // Tồn tại duy nhất = tối đa + tối thiểu
+
     boolean isREdgeCell(int i, int j) {
         return (j == m_limit[RIGHT] && (i > 1 && i < m_limit[DOWN]));
     }
@@ -42,7 +93,17 @@ public class CNFConverter {
         return (i == 1 && (j > 1 && j < m_limit[RIGHT]));
     }
 
-    // Tồn tại duy nhất = tối đa + tối thiểu
+    /*
+     * bits = 0 --> bit = 0 & 1 = 0 --> conversion = 0 --> bits = 0 >> 1 = 0 --> bit = 0 & 1 = 0 --> conversion = 00
+     * bits = 1 --> bit = 1 & 1 = 1 --> conversion = 1 --> bits = 1 >> 1 = 0 --> bit = 0 & 1 = 0 --> conversion = 10
+     * bits = 2 --> bit = 2 & 1 = 0 --> conversion = 0 --> bits = 2 >> 1 = 1 --> bit = 1 & 1 = 1 --> conversion = 01
+     * bits = 3 --> bit = 3 & 1 = 1 --> conversion = 1 --> bits = 3 >> 1 = 1 --> bit = 1 & 1 = 1 --> conversion = 11
+     * stringPermutations = [00, 01, 10, 11]
+     * */
+    // q: why the result of even number AND 1 is 0?
+    // a: because the rightmost bit of even number is 0, so the result of AND 1 is 0
+    // q: why we have to remove the rightmost bit in line 117?
+    // a: because we have to check the next bit of the number
 
     // Các ô liền kề với ô đang xét
     List<Integer> adjacentCells(int i, int j, int value, NumberLink numberLink) {
@@ -84,67 +145,6 @@ public class CNFConverter {
         return res;
     }
 
-    /*
-    return binary strings with fixed length.
-    i.e n=2 [00, 01, 10, 11]
-    n = [log2(num of old variables)]
-    */
-    public static List<String> generateBinaryStrings(int n) {
-        List<String> stringPermutations = new ArrayList<>();
-        // number of permutations is 2^n (represented in binary by 2 bits 0 and 1)
-        int permutations = (int) Math.pow(2, n);
-
-
-        // Sinh du "permutations" chuoi nhi phan
-        for (int bits = 0; bits < permutations; bits++) {
-            String permutation = convert(bits, n);
-            stringPermutations.add(permutation);
-        }
-        Collections.sort(stringPermutations);
-        return stringPermutations;
-    }
-
-    public static String convert(int bits, int n) {
-        String conversion = "";
-        while (n-- > 0) {
-            int bit = bits & 1; // Retrieves the rightmost bit
-            if (bit == 0) {
-                conversion += "0";
-            } else {
-                conversion += "1";
-            }
-
-            // >> means signed right shift
-            bits >>= 1; // Removes the rightmost bit.
-        }
-        return conversion;
-    }
-
-    /*
-    * bits = 0 --> bit = 0 & 1 = 0 --> conversion = 0 --> bits = 0 >> 1 = 0 --> bit = 0 & 1 = 0 --> conversion = 00
-    * bits = 1 --> bit = 1 & 1 = 1 --> conversion = 1 --> bits = 1 >> 1 = 0 --> bit = 0 & 1 = 0 --> conversion = 10
-    * bits = 2 --> bit = 2 & 1 = 0 --> conversion = 0 --> bits = 2 >> 1 = 1 --> bit = 1 & 1 = 1 --> conversion = 01
-    * bits = 3 --> bit = 3 & 1 = 1 --> conversion = 1 --> bits = 3 >> 1 = 1 --> bit = 1 & 1 = 1 --> conversion = 11
-    * stringPermutations = [00, 01, 10, 11]
-    * */
-    // q: why the result of even number AND 1 is 0?
-    // a: because the rightmost bit of even number is 0, so the result of AND 1 is 0
-    // q: why we have to remove the rightmost bit in line 117?
-    // a: because we have to check the next bit of the number
-
-
-
-    // i.e.
-    public static String reverseString(String str) {
-        String nstr = "";
-        char ch;
-        for (int i = 0; i < str.length(); i++) {
-            ch = str.charAt(i); //extracts each character
-            nstr = ch + nstr; //adds each character in front of the existing string
-        }
-        return nstr;
-    }
-
     public SatEncoding generateSat(NumberLink numberLink) {
         m_limit[DOWN] = numberLink.getRow();
         m_limit[RIGHT] = numberLink.getCol();
@@ -155,6 +155,7 @@ public class CNFConverter {
         int variables = 0;
         int clauses = 0;
         List<String> rules = new ArrayList<>();
+        List<String> additionalRule = new ArrayList<>();
         for (int i = 1; i < inputs.length; i++) {
             for (int j = 1; j < inputs[i].length; j++) {
 
@@ -163,14 +164,23 @@ public class CNFConverter {
 
                     List<String> rule0 = valueFromInput(i, j, inputs[i][j], numberLink);
                     List<String> rule1 = notValuesFromInput(i, j, inputs[i][j], numberLink);
-                    clauses += rule1.size();
-                    rules.addAll(rule1);
                     List<String> rule2 = exact_one_direction(i, j, numberLink);
 
-                    clauses += rule0.size() + rule2.size();
+                    int index = inputs[i][j];
+//                  Add index of numbered cells to source and target arrays
+                    if (source[index][0] == 0 && source[index][1] == 0) {
+                        source[index][0] = i;
+                        source[index][1] = j;
+                    } else {
+                        target[index][0] = i;
+                        target[index][1] = j;
+                    }
 
                     rules.addAll(rule0);
+                    rules.addAll(rule1);
                     rules.addAll(rule2);
+
+                    clauses += rule0.size() + rule1.size() + rule2.size();
 
                     // blank cell
                 } else {
@@ -188,12 +198,52 @@ public class CNFConverter {
             }
         }
 
+        // Adding row and column contraints (addtional rule)
+        additionalRule = additionalRule(source, target, max_num, m_limit[DOWN], m_limit[RIGHT], inputs, numberLink);
+        rules.addAll(additionalRule);
+        clauses += additionalRule.size();
+        Arrays.stream(source).forEach(x -> Arrays.fill(x, 0));
+        Arrays.stream(target).forEach(x -> Arrays.fill(x, 0));
+
         variables = m_limit[DOWN] * m_limit[RIGHT] * max_num +
                 adding_vars * (m_limit[DOWN] * m_limit[RIGHT] - max_num * 2);
         // adding_vars * (m_limit[DOWN] * m_limit[RIGHT] - max_num * 2) --> for blank cells (not cells have number)
         return new SatEncoding(rules, clauses, variables);
     }
 
+    public List<String> additionalRule(int[][] source, int[][] target, int maxNum, int row, int col, int[][] inputs, NumberLink numberlink) {
+        List<String> res = new ArrayList<>();
+
+        for (int i = 1; i <= maxNum; i++) {
+            int startRow = source[i][0] > target[i][0] ? target[i][0] + 1 : source[i][0] + 1;
+            int endRow = source[i][0] > target[i][0] ? source[i][0] - 1 : target[i][0] - 1;
+            int startCol = source[i][1] > target[i][1] ? target[i][1] + 1 : source[i][1] + 1;
+            int endCol = source[i][1] > target[i][1] ? source[i][1] - 1 : target[i][1] - 1;
+            // Row constraints
+            for (int j = startRow; j <= endRow; j++) {
+                String rowConstraint = "";
+                for (int k = 1; k <= col; k++) {
+                    if (inputs[j][k] == 0) {
+                        rowConstraint += computePosition(j, k, i, numberlink) + " ";
+                    }
+                }
+                rowConstraint += "0";
+                res.add(rowConstraint);
+            }
+            // Col constraints
+            for (int j = startCol; j <= endCol; j++) {
+                String colConstraint = "";
+                for (int k = 1; k <= row; k++) {
+                    if (inputs[k][j] == 0) {
+                        colConstraint += computePosition(k, j, i, numberlink) + " ";
+                    }
+                }
+                colConstraint += "0";
+                res.add(colConstraint);
+            }
+        }
+        return res;
+    }
 
     // Blank cells have two directions
     private List<String> has_two_directions(int i, int j, NumberLink numberLink) {
@@ -369,12 +419,12 @@ public class CNFConverter {
         }
 
         // ALO
-//        String ALOclause = "";
-//        for (int k = 1; k <= max_num; k++) {
-//            ALOclause += computePosition(i, j, k, numberLink) + " ";
-//        }
-//        ALOclause += "0";
-//        resultStringList.add(ALOclause);
+        String ALOclause = "";
+        for (int k = 1; k <= max_num; k++) {
+            ALOclause += computePosition(i, j, k, numberLink) + " ";
+        }
+        ALOclause += "0";
+        resultStringList.add(ALOclause);
 
 
         return resultStringList;
