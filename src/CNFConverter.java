@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CNFConverter {
@@ -8,6 +9,8 @@ public class CNFConverter {
     public static final int DOWN = 4;
     //    public static final int[] DIR = new int[]{ -1000, -1, 1};
     public static int[] m_limit = new int[]{0, 1, 10, 1, 10};
+    int[][] source = new int[100][2];
+    int[][] target = new int[100][2];
 
     boolean isLUCornerCell(int i, int j) {
         return (i == 1 && j == 1);
@@ -45,9 +48,11 @@ public class CNFConverter {
         m_limit[DOWN] = numberLink.getRow();
         m_limit[RIGHT] = numberLink.getCol();
         int[][] inputs = numberLink.getInputs();
+        int max_num = numberLink.getMaxNum();
         int variables = 0;
         int clauses = 0;
         List<String> rules = new ArrayList<>();
+        List<String> additionalRule = new ArrayList<>();
         for (int i = 1; i < inputs.length; i++) {
             for (int j = 1; j < inputs[i].length; j++) {
 
@@ -55,10 +60,7 @@ public class CNFConverter {
                 if (inputs[i][j] != 0) {
 
                     List<String> rule0 = valueFromInput(i, j, inputs[i][j], numberLink);
-//                    System.out.println("Rule 0" + rule0);
                     List<String> rule1 = notValuesFromInput(i, j, inputs[i][j], numberLink);
-                    clauses += rule1.size();
-                    rules.addAll(rule1);
                     List<String> rule2;
                     if (isLUCornerCell(i, j)) {
                         rule2 = LUConner_exact_one_direction(i, j, numberLink);
@@ -79,11 +81,23 @@ public class CNFConverter {
                     } else {
                         rule2 = exact_one_direction(i, j, numberLink);
                     }
-                    clauses += rule0.size() + rule2.size();
+
+                    int index = inputs[i][j];
+//                  Add index of numbered cells to source and target arrays
+                    if (source[index][0] == 0 && source[index][1] == 0) {
+                        source[index][0] = i;
+                        source[index][1] = j;
+                    } else {
+                        target[index][0] = i;
+                        target[index][1] = j;
+                    }
+
+                    clauses += rule0.size() + rule1.size() + rule2.size();
 
                     rules.addAll(rule0);
+                    rules.addAll(rule1);
                     rules.addAll(rule2);
-//                    System.out.println("Rule 2" + rule2);
+
                     // blank cell
                 } else {
                     List<String> baseRule1 = onlyOneValue(i, j, numberLink);
@@ -119,10 +133,50 @@ public class CNFConverter {
 
             }
         }
+        // Adding row and column contraints (addtional rule)
+        additionalRule = additionalRule(source, target, max_num, m_limit[DOWN], m_limit[RIGHT], inputs, numberLink);
+        rules.addAll(additionalRule);
+        clauses += additionalRule.size();
+        Arrays.stream(source).forEach(x -> Arrays.fill(x, 0));
+        Arrays.stream(target).forEach(x -> Arrays.fill(x, 0));
+
         variables = numberLink.getRow() * numberLink.getCol() * numberLink.getMaxNum();
         return new SatEncoding(rules, clauses, variables);
     }
 
+    public List<String> additionalRule(int[][] source, int[][] target, int maxNum, int row, int col, int[][] inputs, NumberLink numberlink) {
+        List<String> res = new ArrayList<>();
+
+        for (int i = 1; i <= maxNum; i++) {
+            int startRow = source[i][0] > target[i][0] ? target[i][0] + 1 : source[i][0] + 1;
+            int endRow = source[i][0] > target[i][0] ? source[i][0] - 1 : target[i][0] - 1;
+            int startCol = source[i][1] > target[i][1] ? target[i][1] + 1 : source[i][1] + 1;
+            int endCol = source[i][1] > target[i][1] ? source[i][1] - 1 : target[i][1] - 1;
+            // Row constraints
+            for (int j = startRow; j <= endRow; j++) {
+                String rowConstraint = "";
+                for (int k = 1; k <= col; k++) {
+                    if (inputs[j][k] == 0) {
+                        rowConstraint += computePosition(j, k, i, numberlink) + " ";
+                    }
+                }
+                rowConstraint += "0";
+                res.add(rowConstraint);
+            }
+            // Col constraints
+            for (int j = startCol; j <= endCol; j++) {
+                String colConstraint = "";
+                for (int k = 1; k <= row; k++) {
+                    if (inputs[k][j] == 0) {
+                        colConstraint += computePosition(k, j, i, numberlink) + " ";
+                    }
+                }
+                colConstraint += "0";
+                res.add(colConstraint);
+            }
+        }
+        return res;
+    }
 
     private List<String> has_two_directions(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
@@ -214,7 +268,7 @@ public class CNFConverter {
             }
         }*/
         return resultStringList;
-    } 
+    }
 
     private List<String> exact_one_direction(int i, int j, NumberLink numberLink) {
         List<String> resultStringList = new ArrayList<>();
@@ -727,7 +781,7 @@ public class CNFConverter {
 //        exactNumLine += "0";
 //        resultStringList.add(exactNumLine);
 
-        for (int k = 1; k <= numberLink.getMaxNum()-1; k++) {
+        for (int k = 1; k <= numberLink.getMaxNum() - 1; k++) {
             String firstClause = -computePosition(i, j, k, numberLink) + " ";
             for (int q = k + 1; q <= numberLink.getMaxNum(); q++) {
                 String secondClause = -computePosition(i, j, q, numberLink) + " ";

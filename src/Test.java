@@ -18,7 +18,7 @@ public class Test {
     static String inputFolderPath1 = "./input";
     static String inputFolderPath2 = "E:\\Lab\\TC";
     public static File inFolder = new File(inputFolderPath1);
-    public static File outFile = new File("./output/out231402_noALO.txt");
+    public static File outFile = new File("./output/outtest.txt");
 
     static List<String> res;
 
@@ -38,11 +38,12 @@ public class Test {
                         /*long t1 = System.currentTimeMillis();*/
 
                         ExecutorService executor = Executors.newFixedThreadPool(4);
+                        String finalFileName = fileName.substring(0, fileName.lastIndexOf('.')).replace(" ", "_");
                         Future<?> future = executor.submit(new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    controller.encode();
+                                    controller.encode(finalFileName);
                                     //controller.write();
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -59,7 +60,7 @@ public class Test {
                         executor.shutdown();            //        reject all further submissions
 
                         try {
-                            future.get(1500, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
+                            future.get(50, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
                         } catch (InterruptedException e) {    //     possible error cases
                             System.out.println("job was interrupted");
                         } catch (ExecutionException e) {
@@ -67,8 +68,8 @@ public class Test {
                         } catch (java.util.concurrent.TimeoutException e) {
                             future.cancel(true);              //     interrupt the job
                             System.out.println("timeout");
-                            controller.sat = "UNSAT";
-                            System.out.println("UNSAT");
+                            controller.sat = "UNKNOWN";
+                            System.out.println("UNKNOWN");
                             time = "time out";
                         }
                         // wait all unfinished tasks for sec
