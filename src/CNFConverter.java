@@ -773,13 +773,12 @@ public class CNFConverter {
         List<String> resultStringList = new ArrayList<>();
         //String tmpClause = "onlyOneValue";
         //resultStringList.add(tmpClause);
-//        String exactNumLine = "";
-//
-//        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
-//            exactNumLine += computePosition(i, j, k, numberLink) + " ";
-//        }
-//        exactNumLine += "0";
-//        resultStringList.add(exactNumLine);
+        String exactNumLine = "";
+        for (int k = 1; k <= numberLink.getMaxNum(); k++) {
+            exactNumLine += computePosition(i, j, k, numberLink) + " ";
+        }
+        exactNumLine += "0";
+        resultStringList.add(exactNumLine);
 
         for (int k = 1; k <= numberLink.getMaxNum() - 1; k++) {
             String firstClause = -computePosition(i, j, k, numberLink) + " ";
