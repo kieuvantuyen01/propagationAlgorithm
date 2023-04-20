@@ -419,12 +419,12 @@ public class CNFConverter {
         }
 
         // ALO
-        String ALOclause = "";
-        for (int k = 1; k <= max_num; k++) {
-            ALOclause += computePosition(i, j, k, numberLink) + " ";
-        }
-        ALOclause += "0";
-        resultStringList.add(ALOclause);
+//        String ALOclause = "";
+//        for (int k = 1; k <= max_num; k++) {
+//            ALOclause += computePosition(i, j, k, numberLink) + " ";
+//        }
+//        ALOclause += "0";
+//        resultStringList.add(ALOclause);
 
 
         return resultStringList;
