@@ -242,7 +242,7 @@ public class Controller {
     public static void encode(String fileName) throws IOException, TimeoutException, ParseFormatException, ContradictionException {
         long t1 = System.currentTimeMillis();
         // Ghi ra file CNF
-        String fileCNFName = "./cnf_ALO/" + fileName + ".cnf";
+        String fileCNFName = "./cnf_noALO_v3/" + fileName + ".cnf";
         File fileCNF = new File(fileCNFName);
         FileWriter writer = new FileWriter(fileCNF);
 

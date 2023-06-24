@@ -11,6 +11,7 @@ public class CNFConverter {
     public static int[] m_limit = new int[]{0, 1, 10, 1, 10};
     int[][] source = new int[100][2];
     int[][] target = new int[100][2];
+    int[][] blankCells;
 
     /*
     return binary strings with fixed length.
@@ -154,6 +155,9 @@ public class CNFConverter {
         int[][] inputs = numberLink.getInputs();
         int variables = 0;
         int clauses = 0;
+        int numOfBlankCells = m_limit[DOWN] * m_limit[RIGHT] - max_num * 2;
+        blankCells = new int[numOfBlankCells][2];
+        int indexBlankCell = 0;
         List<String> rules = new ArrayList<>();
         List<String> additionalRule = new ArrayList<>();
         for (int i = 1; i < inputs.length; i++) {
@@ -184,15 +188,16 @@ public class CNFConverter {
 
                     // blank cell
                 } else {
-                    List<String> baseRule1 = onlyOneValue(i, j, numberLink);
+                    blankCells[indexBlankCell][0] = i;
+                    blankCells[indexBlankCell][1] = j;
+                    indexBlankCell++;
 
+                    List<String> baseRule1 = onlyOneValue(i, j, numberLink);
                     clauses += baseRule1.size();
                     rules.addAll(baseRule1);
 
                     List<String> rule2 = has_two_directions(i, j, numberLink);
-
                     clauses += rule2.size();
-
                     rules.addAll(rule2);
                 }
             }
@@ -387,6 +392,7 @@ public class CNFConverter {
 //        String tmpClause = "onlyOneValue";
 //        resultStringList.add(tmpClause);
         int max_num = numberLink.getMaxNum(); // max_num = 4 (5x5 1.in)
+        int X_vars = max_num * numberLink.getRow() * numberLink.getCol(); // X_vars = 100 (5x5 1.in)
         int adding_vars = (int) Math.ceil((Math.log(max_num) / Math.log(2))); // adding_vars = log2(4) = 2
         List<String> binaryStrings = generateBinaryStrings(adding_vars);
         // binaryStrings = ["00", "01", "10", "11"]
@@ -394,37 +400,56 @@ public class CNFConverter {
         binaryStrings = binaryStrings.subList(0, max_num);
         // binaryStrings = ["00", "01", "10", "11"]
 
+        // ALO
+//        String ALOclause = "";
+//        for (int k = 1; k <= max_num; k++) {
+//            ALOclause += computePosition(i, j, k, numberLink) + " ";
+//        }
+//        ALOclause += "0";
+//        resultStringList.add(ALOclause);
+
         // AMO
         for (int k = 1; k <= max_num; k++) { // k = 1 --> 4
 
             String binary = binaryStrings.get(k - 1);
             binary = reverseString(binary);
             // binary = "00"
-            for (int q = max_num + 1; q <= max_num + adding_vars; q++) {  // q = 5 --> 6
+//            for (int q = max_num + 1; q <= max_num + adding_vars; q++) {  // q = 5 --> 6
+//                String clause = "";
+//                // -X v
+//                clause += -computePosition(i, j, k, numberLink) + " ";
+//                // clause = -Xijk
+//                char bit = binary.charAt(q - max_num - 1);
+//                if (bit == '0') {
+//                    // -Y
+//                    clause += -computePosition(i, j, q, numberLink) + " ";
+//                } else {
+//                    // Y
+//                    clause += computePosition(i, j, q, numberLink) + " ";
+//                }
+//                clause += "0";
+//                resultStringList.add(clause);
+//            }
+            for (int q = 1; q <= adding_vars; q++) {  // q = 1--> 2
                 String clause = "";
                 // -X v
                 clause += -computePosition(i, j, k, numberLink) + " ";
                 // clause = -Xijk
-                char bit = binary.charAt(q - max_num - 1);
+                char bit = binary.charAt(q - 1);
                 if (bit == '0') {
                     // -Y
-                    clause += -computePosition(i, j, q, numberLink) + " ";
+//                    clause += -computePosition(i, j, q, numberLink) + " ";
+                    clause += -computePositionForBlankCell(i, j, X_vars, adding_vars, q, blankCells) + " ";
                 } else {
                     // Y
-                    clause += computePosition(i, j, q, numberLink) + " ";
+//                    clause += computePosition(i, j, q, numberLink) + " ";
+                    clause += computePositionForBlankCell(i, j, X_vars, adding_vars, q, blankCells) + " ";
                 }
                 clause += "0";
                 resultStringList.add(clause);
             }
         }
 
-        // ALO
-        String ALOclause = "";
-        for (int k = 1; k <= max_num; k++) {
-            ALOclause += computePosition(i, j, k, numberLink) + " ";
-        }
-        ALOclause += "0";
-        resultStringList.add(ALOclause);
 
 
         return resultStringList;
@@ -469,6 +494,16 @@ public class CNFConverter {
             return n * (i - 1) * max_num + (j - 1) * max_num + value;
         return X_vars + n * (i - 1) * adding_vars + (j - 1) * adding_vars + value;
         // X_vars = row * col * max_num = 5 * 5 * 4 = 100
+    }
+
+    private int computePositionForBlankCell(int i, int j, int X_vars, int newVars, int value, int[][] blankCells) {
+        int[] subArr = {i, j};
+        for (int k = 0; k < blankCells.length; k++) {
+            if (Arrays.equals(blankCells[k], subArr)) {
+                return X_vars + k * newVars + value;
+            }
+        }
+        return -1;
     }
 
     public int getValueOfY(int positionValue, int maxNum, NumberLink numberLink) {
