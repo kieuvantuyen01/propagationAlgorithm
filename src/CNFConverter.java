@@ -204,11 +204,11 @@ public class CNFConverter {
         }
 
         // Adding row and column contraints (addtional rule)
-        additionalRule = additionalRule(source, target, max_num, m_limit[DOWN], m_limit[RIGHT], inputs, numberLink);
-        rules.addAll(additionalRule);
-        clauses += additionalRule.size();
-        Arrays.stream(source).forEach(x -> Arrays.fill(x, 0));
-        Arrays.stream(target).forEach(x -> Arrays.fill(x, 0));
+//        additionalRule = additionalRule(source, target, max_num, m_limit[DOWN], m_limit[RIGHT], inputs, numberLink);
+//        rules.addAll(additionalRule);
+//        clauses += additionalRule.size();
+//        Arrays.stream(source).forEach(x -> Arrays.fill(x, 0));
+//        Arrays.stream(target).forEach(x -> Arrays.fill(x, 0));
 
         variables = m_limit[DOWN] * m_limit[RIGHT] * max_num +
                 adding_vars * (m_limit[DOWN] * m_limit[RIGHT] - max_num * 2);
@@ -401,12 +401,12 @@ public class CNFConverter {
         // binaryStrings = ["00", "01", "10", "11"]
 
         // ALO
-//        String ALOclause = "";
-//        for (int k = 1; k <= max_num; k++) {
-//            ALOclause += computePosition(i, j, k, numberLink) + " ";
-//        }
-//        ALOclause += "0";
-//        resultStringList.add(ALOclause);
+        String ALOclause = "";
+        for (int k = 1; k <= max_num; k++) {
+            ALOclause += computePosition(i, j, k, numberLink) + " ";
+        }
+        ALOclause += "0";
+        resultStringList.add(ALOclause);
 
         // AMO
         for (int k = 1; k <= max_num; k++) { // k = 1 --> 4

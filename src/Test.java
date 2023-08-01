@@ -15,7 +15,7 @@ public class Test {
     private static final int CLAUSES_NUM = 4;
     private static final int TIME = 5;
     private static final int SAT = 6;
-    public static File outFile = new File("./output/outtest_noALO.txt");
+    public static File outFile = new File("./output/outtest_ALO_010823.txt");
     static Controller controller = new Controller();
     static String inputFolderPath1 = "./input";
     //    static String inputFolderPath2 = "E:\\Lab\\TC";
