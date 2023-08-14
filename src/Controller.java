@@ -409,4 +409,11 @@ public class Controller {
             e.printStackTrace();
         }
     }
+
+    public static String getDateTime() {
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        return sdf.format(dt);
+    }
 }

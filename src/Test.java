@@ -14,11 +14,14 @@ public class Test {
     private static final int CLAUSES_NUM = 4;
     private static final int TIME = 5;
     private static final int SAT = 6;
+    private static final long TIMEOUT = 900;
     static Controller controller = new Controller();
-    static String inputFolderPath1 = "./input";
+    static String inputFolderPath1 = "./input3";
     static String inputFolderPath2 = "E:\\Lab\\TC";
     public static File inFolder = new File(inputFolderPath1);
-    public static File outFile = new File("./output/outtest_noALO_280623.txt");
+    // output file path consists of Datetime
+    public static File outFile = new File("./output/out_" + Controller.getDateTime() + ".txt");
+    //public static File outFile = new File("./output/outtest_noALO_280623.txt");
 
     static List<String> res;
 
@@ -60,7 +63,7 @@ public class Test {
                         executor.shutdown();            //        reject all further submissions
 
                         try {
-                            future.get(100, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
+                            future.get(TIMEOUT, TimeUnit.SECONDS);  //     wait Time (seconds) to finish
                         } catch (InterruptedException e) {    //     possible error cases
                             System.out.println("job was interrupted");
                         } catch (ExecutionException e) {
